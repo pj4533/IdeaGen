@@ -9,27 +9,33 @@ import Foundation
 import SwiftUI
 import OSLog
 
-class UserSettings: ObservableObject {
+// Mark UserSettings as MainActor since it deals with UI state
+@MainActor
+final class UserSettings: ObservableObject, Sendable {
     static let shared = UserSettings()
     
+    // UserDefaults is thread-safe for reading
     private let defaults: UserDefaults
     
     @Published var ideaPrompt: String {
         didSet {
             Logger.settings.debug("Updating idea prompt in UserDefaults")
-            DispatchQueue.main.async {
-                self.defaults.set(self.ideaPrompt, forKey: "ideaPrompt")
-            }
+            // Already on MainActor, no need for DispatchQueue.main
+            self.defaults.set(self.ideaPrompt, forKey: "ideaPrompt")
         }
     }
     
     @Published var apiKeyStored: Bool {
         didSet {
             Logger.settings.debug("Updating apiKeyStored flag: \(self.apiKeyStored)")
-            DispatchQueue.main.async {
-                self.defaults.set(self.apiKeyStored, forKey: "apiKeyStored")
-            }
+            // Already on MainActor, no need for DispatchQueue.main
+            self.defaults.set(self.apiKeyStored, forKey: "apiKeyStored")
         }
+    }
+    
+    // Helper method for cross-actor access
+    func setApiKeyStored(_ value: Bool) {
+        apiKeyStored = value
     }
     
     init(defaults: UserDefaults = .standard) {

@@ -13,45 +13,45 @@ import os.log
 struct KeychainManagerTests {
     
     // Helper to test any KeychainManaging implementation
-    func runKeychainTests(with keychain: KeychainManaging) {
+    func runKeychainTests(with keychain: KeychainManaging) async {
         // First check that no key exists
-        let initialKey = keychain.getApiKey()
+        let initialKey = await keychain.getApiKey()
         #expect(initialKey == nil, "Initially no key should be present")
         
         // Save a key
         let testKey = "test-api-key-12345"
-        let saveResult = keychain.saveApiKey(testKey)
+        let saveResult = await keychain.saveApiKey(testKey)
         #expect(saveResult == true, "Saving API key should succeed")
         
         // Retrieve it
-        let retrievedKey = keychain.getApiKey()
+        let retrievedKey = await keychain.getApiKey()
         #expect(retrievedKey == testKey, "Retrieved key should match the saved key")
         
         // Update it
         let updatedKey = "updated-test-key"
-        let updateResult = keychain.saveApiKey(updatedKey)
+        let updateResult = await keychain.saveApiKey(updatedKey)
         #expect(updateResult == true, "Updating API key should succeed")
         
         // Check that it was updated
-        let retrievedUpdatedKey = keychain.getApiKey()
+        let retrievedUpdatedKey = await keychain.getApiKey()
         #expect(retrievedUpdatedKey == updatedKey, "Retrieved key should match updated key")
         
         // Delete it
-        let deleteResult = keychain.deleteApiKey()
+        let deleteResult = await keychain.deleteApiKey()
         #expect(deleteResult == true, "Deleting API key should succeed")
         
         // Check that it's gone
-        #expect(keychain.getApiKey() == nil, "Key should be nil after deletion")
+        #expect(await keychain.getApiKey() == nil, "Key should be nil after deletion")
         
         // Try to save an empty key
-        let emptyKeyResult = keychain.saveApiKey("")
+        let emptyKeyResult = await keychain.saveApiKey("")
         #expect(emptyKeyResult == false, "Saving empty API key should fail")
     }
     
     // Test mock implementation
     @Test func testMockKeychain() async throws {
         let mockKeychain = MockKeychainManager()
-        runKeychainTests(with: mockKeychain)
+        await runKeychainTests(with: mockKeychain)
     }
     
     // Test real implementation with test service/account
@@ -65,34 +65,34 @@ struct KeychainManagerTests {
         let testKeychain = KeychainManager(service: "com.test.IdeaGen.UnitTests", account: "TestApiKey")
         
         // Clean up any previous test data
-        _ = testKeychain.deleteApiKey()
+        _ = await testKeychain.deleteApiKey()
         
         // Test simplified keychain operations to avoid simulator limitations
         
         // Try to save a key
         let testKey = "test-api-key-12345"
-        let saveResult = testKeychain.saveApiKey(testKey)
+        let saveResult = await testKeychain.saveApiKey(testKey)
         
         // If we can save to the keychain, run additional tests
         if saveResult {
             // Retrieve it
-            let retrievedKey = testKeychain.getApiKey()
+            let retrievedKey = await testKeychain.getApiKey()
             #expect(retrievedKey == testKey, "Retrieved key should match the saved key")
             
             // Delete it
-            let deleteResult = testKeychain.deleteApiKey()
+            let deleteResult = await testKeychain.deleteApiKey()
             #expect(deleteResult == true, "Deleting API key should succeed")
             
             // Verify it's gone
-            #expect(testKeychain.getApiKey() == nil, "Key should be nil after deletion")
+            #expect(await testKeychain.getApiKey() == nil, "Key should be nil after deletion")
         } else {
             // In simulator context, we may not be able to save to keychain
             // So we'll just verify empty key behavior
-            let emptyKeyResult = testKeychain.saveApiKey("")
+            let emptyKeyResult = await testKeychain.saveApiKey("")
             #expect(emptyKeyResult == false, "Saving empty API key should fail")
         }
         
         // Always clean up after test
-        _ = testKeychain.deleteApiKey()
+        _ = await testKeychain.deleteApiKey()
     }
 }

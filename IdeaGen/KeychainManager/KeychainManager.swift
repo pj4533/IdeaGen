@@ -9,14 +9,16 @@ import Foundation
 import Security
 import OSLog
 
-protocol KeychainManaging {
-    func saveApiKey(_ key: String) -> Bool
-    func getApiKey() -> String?
-    func deleteApiKey() -> Bool
+// Update protocol for Swift 6 concurrency
+protocol KeychainManaging: Sendable {
+    func saveApiKey(_ key: String) async -> Bool
+    func getApiKey() async -> String?
+    func deleteApiKey() async -> Bool
 }
 
-class KeychainManager: KeychainManaging {
-    enum KeychainError: Error {
+// Make KeychainManager actor for thread safety
+actor KeychainManager: KeychainManaging {
+    enum KeychainError: Error, Sendable {
         case itemNotFound
         case invalidItemFormat
         case unexpectedStatus(OSStatus)
@@ -31,6 +33,7 @@ class KeychainManager: KeychainManaging {
         self.account = account
     }
     
+    // We don't need to add 'async' here because actor methods are implicitly async
     func saveApiKey(_ key: String) -> Bool {
         Logger.keychain.debug("Attempting to save API key to keychain")
         guard let data = key.data(using: .utf8) else {
@@ -81,6 +84,7 @@ class KeychainManager: KeychainManaging {
         return false
     }
     
+    // Actor methods are implicitly async
     func getApiKey() -> String? {
         Logger.keychain.debug("Attempting to retrieve API key from keychain")
         
@@ -118,6 +122,7 @@ class KeychainManager: KeychainManaging {
         return key
     }
     
+    // Actor methods are implicitly async
     func deleteApiKey() -> Bool {
         Logger.keychain.debug("Attempting to delete API key from keychain")
         

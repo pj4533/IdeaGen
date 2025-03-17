@@ -11,13 +11,18 @@ import SwiftUI
 import os.log
 @testable import IdeaGen
 
+@MainActor
 struct SettingsViewModelTests {
     
-    // Test masking API key functionality
-    @Test func testMaskApiKey() async throws {
-        let viewModel = SettingsViewModel(userSettings: UserSettings())
+    // Test masking API key functionality - nonisolated function can be tested directly
+    @Test func testMaskApiKey() async {
+        // Create UserSettings on MainActor for test only - No need to run separately
+        let userSettings = UserSettings()
         
-        // Test with normal key
+        // Create ViewModel
+        let viewModel = SettingsViewModel(userSettings: userSettings)
+        
+        // Test with normal key (nonisolated functions don't need await)
         let testKey = "sk-abcdefghijklmnopqrst1234"
         let masked = viewModel.maskApiKey(testKey)
         #expect(masked == "sk-a••••••••••••1234", "Key should be properly masked")
@@ -34,23 +39,19 @@ struct SettingsViewModelTests {
     }
     
     // Test editing state management
-    @Test func testEditingStateManagement() throws {
-        // Need to use mocking differently since we can't modify the shared instance
-        
-        // Setup
+    @Test func testEditingStateManagement() async {
+        // Create UserSettings and ViewModel on MainActor
         let userSettings = UserSettings()
-        
-        // Create viewModel with custom properties for testing
         let viewModel = SettingsViewModel(userSettings: userSettings)
         
         // Test initial state
         #expect(viewModel.isEditingApiKey == false, "Should not be in editing mode initially")
         
-        // Start editing
+        // Start editing - this function uses tasks internally
         viewModel.startEditing()
         #expect(viewModel.isEditingApiKey == true, "Should be in editing mode after startEditing")
         
-        // Cancel editing
+        // Cancel editing - this function uses tasks internally
         viewModel.cancelEditing()
         #expect(viewModel.isEditingApiKey == false, "Should exit editing mode after cancelEditing")
         
@@ -69,8 +70,8 @@ struct SettingsViewModelTests {
     }
     
     // Test alert messages
-    @Test func testAlertMessages() throws {
-        // Setup
+    @Test func testAlertMessages() async {
+        // Create UserSettings and ViewModel on MainActor
         let userSettings = UserSettings()
         let viewModel = SettingsViewModel(userSettings: userSettings)
         

@@ -9,7 +9,7 @@ import Foundation
 @testable import IdeaGen
 
 /// A mock implementation of KeychainManager for testing purposes
-class MockKeychainManager: KeychainManaging {
+actor MockKeychainManager: KeychainManaging {
     static let shared = MockKeychainManager()
     
     private var storage: [String: String] = [:]
