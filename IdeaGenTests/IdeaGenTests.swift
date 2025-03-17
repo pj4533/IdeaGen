@@ -13,19 +13,18 @@ import os.log
 struct IdeaGenTests {
     // Test UserSettings defaults
     @Test func testUserSettingsDefaults() async throws {
-        // Clear any existing settings
-        UserDefaults.standard.removeObject(forKey: "ideaPrompt")
-        UserDefaults.standard.removeObject(forKey: "apiKeyStored")
+        // Create a new UserDefaults instance for testing instead of using shared standard
+        let testDefaults = UserDefaults(suiteName: "test_defaults")!
+        testDefaults.removePersistentDomain(forName: "test_defaults")
         
-        // Access the settings
-        let settings = UserSettings.shared
+        // Create a test settings instance with our test defaults
+        let settings = UserSettings(defaults: testDefaults)
         
         // Check default prompt is set with expected content
         #expect(settings.ideaPrompt.contains("Generate"), "Default idea prompt should be set with expected content")
         #expect(settings.apiKeyStored == false, "API key stored should default to false")
         
         // Clean up
-        UserDefaults.standard.removeObject(forKey: "ideaPrompt")
-        UserDefaults.standard.removeObject(forKey: "apiKeyStored")
+        testDefaults.removePersistentDomain(forName: "test_defaults")
     }
 }

@@ -12,14 +12,14 @@ import os.log
 
 struct KeychainManagerTests {
     
-    @Sendable func setup() {
-        MockKeychainManager.shared.reset()
-    }
+    // No longer needed since we create new instances for each test
+    // @Sendable func setup() {
+    //     MockKeychainManager.shared.reset()
+    // }
     
     // Test saving API key with mock
     @Test func testSaveAndRetrieveApiKey() async throws {
-        setup()
-        let mockKeychain = MockKeychainManager.shared
+        let mockKeychain = MockKeychainManager()
         
         // First check that no key exists
         let initialKey = mockKeychain.getApiKey()
@@ -37,12 +37,13 @@ struct KeychainManagerTests {
     
     // Test update API key with mock
     @Test func testUpdateApiKey() async throws {
-        setup()
-        let mockKeychain = MockKeychainManager.shared
+        // Create a fresh instance instead of using shared
+        let mockKeychain = MockKeychainManager()
         
         // First save a key
         let initialKey = "initial-test-key"
-        mockKeychain.saveApiKey(initialKey)
+        let saveResult = mockKeychain.saveApiKey(initialKey)
+        #expect(saveResult == true, "Saving initial API key should succeed")
         
         // Then update it
         let updatedKey = "updated-test-key"
@@ -56,8 +57,7 @@ struct KeychainManagerTests {
     
     // Test deleting API key with mock
     @Test func testDeleteApiKey() async throws {
-        setup()
-        let mockKeychain = MockKeychainManager.shared
+        let mockKeychain = MockKeychainManager()
         
         // First save a key
         mockKeychain.saveApiKey("test-api-key-12345")
@@ -75,8 +75,7 @@ struct KeychainManagerTests {
     
     // Test handling empty API key with mock
     @Test func testEmptyApiKey() async throws {
-        setup()
-        let mockKeychain = MockKeychainManager.shared
+        let mockKeychain = MockKeychainManager()
         
         // Try to save an empty key
         let saveResult = mockKeychain.saveApiKey("")

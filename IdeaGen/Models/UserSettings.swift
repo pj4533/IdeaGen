@@ -12,24 +12,27 @@ import OSLog
 class UserSettings: ObservableObject {
     static let shared = UserSettings()
     
+    private let defaults: UserDefaults
+    
     @Published var ideaPrompt: String {
         didSet {
             Logger.settings.debug("Updating idea prompt in UserDefaults")
-            UserDefaults.standard.set(self.ideaPrompt, forKey: "ideaPrompt")
+            defaults.set(self.ideaPrompt, forKey: "ideaPrompt")
         }
     }
     
     @Published var apiKeyStored: Bool {
         didSet {
             Logger.settings.debug("Updating apiKeyStored flag: \(self.apiKeyStored)")
-            UserDefaults.standard.set(self.apiKeyStored, forKey: "apiKeyStored")
+            defaults.set(self.apiKeyStored, forKey: "apiKeyStored")
         }
     }
     
-    private init() {
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         Logger.settings.debug("Initializing user settings")
         
-        if let savedPrompt = UserDefaults.standard.string(forKey: "ideaPrompt") {
+        if let savedPrompt = defaults.string(forKey: "ideaPrompt") {
             self.ideaPrompt = savedPrompt
             Logger.settings.info("Loaded saved idea prompt from UserDefaults")
         } else {
@@ -37,7 +40,7 @@ class UserSettings: ObservableObject {
             Logger.settings.info("Using default idea prompt")
         }
         
-        self.apiKeyStored = UserDefaults.standard.bool(forKey: "apiKeyStored")
+        self.apiKeyStored = defaults.bool(forKey: "apiKeyStored")
         Logger.settings.info("API key stored state: \(self.apiKeyStored)")
     }
 }

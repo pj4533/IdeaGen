@@ -15,7 +15,7 @@ class MockKeychainManager {
     private var storage: [String: String] = [:]
     private let storageKey = "OpenAIApiKey"
     
-    private init() {}
+    init() {}
     
     func saveApiKey(_ key: String) -> Bool {
         guard !key.isEmpty else { return false }
