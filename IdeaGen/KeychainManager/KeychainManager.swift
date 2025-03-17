@@ -9,7 +9,13 @@ import Foundation
 import Security
 import OSLog
 
-class KeychainManager {
+protocol KeychainManaging {
+    func saveApiKey(_ key: String) -> Bool
+    func getApiKey() -> String?
+    func deleteApiKey() -> Bool
+}
+
+class KeychainManager: KeychainManaging {
     enum KeychainError: Error {
         case itemNotFound
         case invalidItemFormat
@@ -17,7 +23,13 @@ class KeychainManager {
     }
     static let shared = KeychainManager()
     
-    private init() {}
+    let service: String
+    let account: String
+    
+    init(service: String = "com.saygoodnight.IdeaGen", account: String = "OpenAIApiKey") {
+        self.service = service
+        self.account = account
+    }
     
     func saveApiKey(_ key: String) -> Bool {
         Logger.keychain.debug("Attempting to save API key to keychain")
@@ -28,8 +40,8 @@ class KeychainManager {
         
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: "OpenAIApiKey",
-            kSecAttrService as String: "com.saygoodnight.IdeaGen"
+            kSecAttrAccount as String: account,
+            kSecAttrService as String: service
         ]
         
         let attributes: [String: Any] = [
@@ -74,8 +86,8 @@ class KeychainManager {
         
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: "OpenAIApiKey",
-            kSecAttrService as String: "com.saygoodnight.IdeaGen",
+            kSecAttrAccount as String: account,
+            kSecAttrService as String: service,
             kSecReturnData as String: true,
             kSecMatchLimit as String: kSecMatchLimitOne
         ]
@@ -111,8 +123,8 @@ class KeychainManager {
         
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: "OpenAIApiKey",
-            kSecAttrService as String: "com.saygoodnight.IdeaGen"
+            kSecAttrAccount as String: account,
+            kSecAttrService as String: service
         ]
         
         let status = SecItemDelete(query as CFDictionary)
