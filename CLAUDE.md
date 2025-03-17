@@ -33,7 +33,20 @@
 
 ## Project Structure
 - **Models/**: Data models and shared state (UserSettings)
-- **Views/**: SwiftUI view components (SettingsView)
+- **Views/**: 
+  - Main SwiftUI view components (SettingsView)
+  - **Views/Settings/**: Components for the settings screen:
+    - SettingsViewModel.swift: View model for settings
+    - ApiKeyViewDisplay.swift: Display component for API key
+    - ApiKeyEditView.swift: Editing component for API key
+    - ApiKeySection.swift: Section containing API key components
+    - IdeaPromptSection.swift: Section for prompt editing
 - **KeychainManager/**: Security utilities for API key storage
 - **Services/**: Network and API communication (future OpenAI integration)
 - **Extensions/**: Swift extensions including logging categories (Logger+Extensions)
+
+## Code Organization Principles
+- Follow MVVM pattern with separate ViewModels for complex views
+- Split large views into smaller component files in subdirectories
+- Each file should focus on a single responsibility
+- Use protocols for testable interfaces like KeychainManaging
