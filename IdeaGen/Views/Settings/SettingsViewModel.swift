@@ -64,8 +64,8 @@ final class SettingsViewModel: ObservableObject, Sendable {
         
         Task {
             if await KeychainManager.shared.saveApiKey(keyToSave) {
-                // Since userSettings is @MainActor, we need to switch to it
-                await userSettings.setApiKeyStored(true)
+                // userSettings is already on MainActor and we're in a MainActor class
+                userSettings.setApiKeyStored(true)
                 isEditingApiKey = false
                 alertMessage = isEditingApiKey ? "API Key updated successfully" : "API Key saved successfully"
                 showAlert = true
@@ -84,7 +84,7 @@ final class SettingsViewModel: ObservableObject, Sendable {
         
         Task {
             if await KeychainManager.shared.deleteApiKey() {
-                await userSettings.setApiKeyStored(false)
+                userSettings.setApiKeyStored(false)
                 alertMessage = "API Key deleted successfully"
                 showAlert = true
                 Logger.ui.info("API key successfully deleted")
