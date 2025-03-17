@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct IdeaGenApp: App {
+    @StateObject private var settings = UserSettings.shared
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(settings)
         }
     }
 }
