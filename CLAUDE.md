@@ -1,11 +1,14 @@
 # IdeaGen Development Guide
 
 ## Build & Test Commands
-- Build app: `xed IdeaGen.xcodeproj` then ⌘+B (or Product > Build)
-- Run app: ⌘+R (or Product > Run)
-- Run all tests: ⌘+U (or Product > Test)
-- Run single test: Select test method and press ⌃+⌥+⌘+U
-- Run UI tests: Select UI test class/method and press ⌃+⌥+⌘+U
+- Open in Xcode: `xed IdeaGen.xcodeproj`
+- Build app (GUI): ⌘+B (or Product > Build)
+- Run app (GUI): ⌘+R (or Product > Run)
+- Run all tests (GUI): ⌘+U (or Product > Test)
+- Run single test (GUI): Select test method and press ⌃+⌥+⌘+U
+- Run UI tests (GUI): Select UI test class/method and press ⌃+⌥+⌘+U
+- Build from command line: `xcodebuild -project IdeaGen.xcodeproj -scheme IdeaGen -configuration Debug -destination "platform=iOS Simulator,name=iPhone 16 Pro" build`
+- Run tests from command line: `xcodebuild -project IdeaGen.xcodeproj -scheme IdeaGen -configuration Debug -destination "platform=iOS Simulator,name=iPhone 16 Pro" test`
 
 ## Code Style Guidelines
 - **Imports**: Group imports with SwiftUI first, then alphabetically
@@ -20,3 +23,10 @@
 - **Access Control**: Mark private properties that aren't used outside their type
 - **Comments**: Use meaningful comments for complex logic, avoid obvious ones
 - **Testing**: Follow AAA pattern (Arrange, Act, Assert) in test methods
+
+## Project Structure
+- **Models/**: Data models and shared state (UserSettings)
+- **Views/**: SwiftUI view components (SettingsView)
+- **KeychainManager/**: Security utilities for API key storage
+- **Services/**: Network and API communication (future OpenAI integration)
+- **Extensions/**: Swift extensions to enhance existing types
