@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import OSLog
 
 struct ContentView: View {
     @EnvironmentObject private var settings: UserSettings
@@ -25,6 +26,7 @@ struct ContentView: View {
                         Text("Please add your OpenAI API key in settings")
                             .multilineTextAlignment(.center)
                         Button("Open Settings") {
+                            Logger.ui.debug("User opened settings from API key prompt")
                             showingSettings = true
                         }
                         .buttonStyle(.borderedProminent)
@@ -39,6 +41,7 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
+                        Logger.ui.debug("User opened settings from gear icon")
                         showingSettings = true
                     } label: {
                         Image(systemName: "gear")

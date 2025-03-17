@@ -23,10 +23,17 @@
 - **Access Control**: Mark private properties that aren't used outside their type
 - **Comments**: Use meaningful comments for complex logic, avoid obvious ones
 - **Testing**: Follow AAA pattern (Arrange, Act, Assert) in test methods
+- **Logging**: Use OSLog with appropriate categories:
+  - `Logger.app`: App lifecycle and general operations
+  - `Logger.keychain`: Security and keychain operations
+  - `Logger.settings`: User preferences and settings
+  - `Logger.network`: API communications
+  - `Logger.ui`: User interface events
+  - Use appropriate log levels (debug, info, error)
 
 ## Project Structure
 - **Models/**: Data models and shared state (UserSettings)
 - **Views/**: SwiftUI view components (SettingsView)
 - **KeychainManager/**: Security utilities for API key storage
 - **Services/**: Network and API communication (future OpenAI integration)
-- **Extensions/**: Swift extensions to enhance existing types
+- **Extensions/**: Swift extensions including logging categories (Logger+Extensions)

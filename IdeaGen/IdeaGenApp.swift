@@ -6,15 +6,23 @@
 //
 
 import SwiftUI
+import OSLog
 
 @main
 struct IdeaGenApp: App {
     @StateObject private var settings = UserSettings.shared
     
+    init() {
+        Logger.app.info("IdeaGen app initializing")
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(settings)
+                .onAppear {
+                    Logger.app.info("Main ContentView appeared")
+                }
         }
     }
 }

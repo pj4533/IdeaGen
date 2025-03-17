@@ -7,6 +7,7 @@
 
 import Foundation
 import Security
+import OSLog
 
 class KeychainManager {
     enum KeychainError: Error {
@@ -19,7 +20,11 @@ class KeychainManager {
     private init() {}
     
     func saveApiKey(_ key: String) -> Bool {
-        guard let data = key.data(using: .utf8) else { return false }
+        Logger.keychain.debug("Attempting to save API key to keychain")
+        guard let data = key.data(using: .utf8) else {
+            Logger.keychain.error("Failed to convert API key to data")
+            return false 
+        }
         
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -37,20 +42,36 @@ class KeychainManager {
         
         if status == errSecSuccess {
             // Update existing item
+            Logger.keychain.info("API key exists in keychain, updating")
             let updateStatus = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+            if updateStatus != errSecSuccess {
+                Logger.keychain.error("Failed to update API key in keychain: \(updateStatus)")
+            } else {
+                Logger.keychain.info("Successfully updated API key in keychain")
+            }
             return updateStatus == errSecSuccess
         } else if status == errSecItemNotFound {
             // Create new item
+            Logger.keychain.info("API key not found in keychain, creating new entry")
             var newQuery = query
             newQuery.merge(attributes) { (_, new) in new }
             let addStatus = SecItemAdd(newQuery as CFDictionary, nil)
+            if addStatus != errSecSuccess {
+                Logger.keychain.error("Failed to add API key to keychain: \(addStatus)")
+            } else {
+                Logger.keychain.info("Successfully added API key to keychain")
+            }
             return addStatus == errSecSuccess
+        } else {
+            Logger.keychain.error("Unexpected keychain status when checking for existing API key: \(status)")
         }
         
         return false
     }
     
     func getApiKey() -> String? {
+        Logger.keychain.debug("Attempting to retrieve API key from keychain")
+        
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: "OpenAIApiKey",
@@ -62,16 +83,32 @@ class KeychainManager {
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         
-        guard status == errSecSuccess,
-              let data = item as? Data,
-              let key = String(data: data, encoding: .utf8) else {
+        if status != errSecSuccess {
+            if status == errSecItemNotFound {
+                Logger.keychain.info("API key not found in keychain")
+            } else {
+                Logger.keychain.error("Failed to retrieve API key from keychain: \(status)")
+            }
             return nil
         }
         
+        guard let data = item as? Data else {
+            Logger.keychain.error("Retrieved keychain item is not in the expected Data format")
+            return nil
+        }
+        
+        guard let key = String(data: data, encoding: .utf8) else {
+            Logger.keychain.error("Failed to convert API key data to string")
+            return nil
+        }
+        
+        Logger.keychain.info("Successfully retrieved API key from keychain")
         return key
     }
     
     func deleteApiKey() -> Bool {
+        Logger.keychain.debug("Attempting to delete API key from keychain")
+        
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: "OpenAIApiKey",
@@ -79,6 +116,16 @@ class KeychainManager {
         ]
         
         let status = SecItemDelete(query as CFDictionary)
-        return status == errSecSuccess || status == errSecItemNotFound
+        
+        if status == errSecSuccess {
+            Logger.keychain.info("Successfully deleted API key from keychain")
+            return true
+        } else if status == errSecItemNotFound {
+            Logger.keychain.info("No API key found to delete in keychain")
+            return true
+        } else {
+            Logger.keychain.error("Failed to delete API key from keychain: \(status)")
+            return false
+        }
     }
 }

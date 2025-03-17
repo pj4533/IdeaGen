@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import OSLog
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -26,14 +27,19 @@ struct SettingsView: View {
                                 Text(maskApiKey(apiKey))
                                     .font(.system(.body, design: .monospaced))
                                     .onAppear {
+                                        Logger.ui.debug("Loading API key for display in settings")
                                         if let key = KeychainManager.shared.getApiKey() {
                                             apiKey = key
+                                            Logger.ui.info("API key loaded and masked for display")
+                                        } else {
+                                            Logger.ui.error("Failed to load API key for display")
                                         }
                                     }
                                 
                                 Spacer()
                                 
                                 Button("Edit") {
+                                    Logger.ui.debug("User initiated API key editing")
                                     isEditingApiKey = true
                                 }
                                 .buttonStyle(.bordered)
@@ -45,8 +51,12 @@ struct SettingsView: View {
                                 .textInputAutocapitalization(.never)
                                 .onAppear {
                                     if settings.apiKeyStored && isEditingApiKey {
+                                        Logger.ui.debug("Loading API key for editing in settings")
                                         if let key = KeychainManager.shared.getApiKey() {
                                             apiKey = key
+                                            Logger.ui.info("API key loaded for editing")
+                                        } else {
+                                            Logger.ui.error("Failed to load API key for editing")
                                         }
                                     }
                                 }
@@ -60,9 +70,11 @@ struct SettingsView: View {
                             
                             if isEditingApiKey {
                                 Button("Cancel") {
+                                    Logger.ui.debug("User canceled API key editing")
                                     isEditingApiKey = false
                                     if let key = KeychainManager.shared.getApiKey() {
                                         apiKey = key
+                                        Logger.ui.info("Restored original API key after canceling edit")
                                     }
                                 }
                                 .frame(maxWidth: .infinity)
@@ -73,11 +85,15 @@ struct SettingsView: View {
                     
                     if settings.apiKeyStored && !isEditingApiKey {
                         Button(action: { 
+                            Logger.ui.debug("User requested API key deletion")
                             apiKey = ""
                             if KeychainManager.shared.deleteApiKey() {
                                 settings.apiKeyStored = false
                                 alertMessage = "API Key deleted successfully"
                                 showAlert = true
+                                Logger.ui.info("API key successfully deleted")
+                            } else {
+                                Logger.ui.error("Failed to delete API key")
                             }
                         }) {
                             Text("Delete API Key")
@@ -109,20 +125,32 @@ struct SettingsView: View {
     }
     
     private func saveApiKey() {
+        Logger.ui.debug("Attempting to save API key")
+        if apiKey.isEmpty {
+            Logger.ui.error("Cannot save empty API key")
+            return
+        }
+        
         if KeychainManager.shared.saveApiKey(apiKey) {
             settings.apiKeyStored = true
             isEditingApiKey = false
             alertMessage = isEditingApiKey ? "API Key updated successfully" : "API Key saved successfully"
             showAlert = true
+            Logger.ui.info("API key saved successfully")
         } else {
             alertMessage = "Failed to save API Key"
             showAlert = true
+            Logger.ui.error("Failed to save API key to keychain")
         }
     }
     
     private func maskApiKey(_ key: String) -> String {
-        guard !key.isEmpty else { return "" }
+        guard !key.isEmpty else { 
+            Logger.ui.debug("Attempted to mask empty API key")
+            return "" 
+        }
         
+        Logger.ui.debug("Masking API key for display")
         let prefix = String(key.prefix(4))
         let suffix = String(key.suffix(4))
         return "\(prefix)••••••••••••\(suffix)"
