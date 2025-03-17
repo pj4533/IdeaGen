@@ -46,7 +46,7 @@ final class UserSettings: ObservableObject, Sendable {
             self.ideaPrompt = savedPrompt
             Logger.settings.info("Loaded saved idea prompt from UserDefaults")
         } else {
-            self.ideaPrompt = "Generate 5 creative app ideas for indie developers that solve real problems"
+            self.ideaPrompt = "a creative app idea that solves real problems"
             Logger.settings.info("Using default idea prompt")
         }
         

@@ -22,7 +22,7 @@ struct IdeaGenTests {
         let settings = UserSettings(defaults: testDefaults)
         
         // Check default prompt is set with expected content
-        #expect(settings.ideaPrompt.contains("Generate"), "Default idea prompt should be set with expected content")
+        #expect(settings.ideaPrompt.contains("creative app idea"), "Default idea prompt should be set with expected content")
         #expect(settings.apiKeyStored == false, "API key stored should default to false")
         
         // Clean up

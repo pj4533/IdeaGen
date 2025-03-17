@@ -11,7 +11,7 @@ struct IdeaPromptSection: View {
     @ObservedObject var settings: UserSettings
     
     var body: some View {
-        Section(header: Text("Idea Prompt"), footer: Text("This prompt will be used to generate ideas")) {
+        Section(header: Text("Idea Prompt"), footer: Text("This prompt will be prefaced with contextual information to generate each idea")) {
             TextEditor(text: $settings.ideaPrompt)
                 .frame(minHeight: 100)
         }
