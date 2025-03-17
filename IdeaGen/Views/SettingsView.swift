@@ -8,123 +8,44 @@
 import SwiftUI
 import OSLog
 
-struct SettingsView: View {
-    @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var settings: UserSettings
+class SettingsViewModel: ObservableObject {
+    @Published var apiKey: String = ""
+    @Published var isEditingApiKey = false
+    @Published var showAlert = false
+    @Published var alertMessage = ""
     
-    @State private var apiKey: String = ""
-    @State private var isEditingApiKey = false
-    @State private var showAlert = false
-    @State private var alertMessage = ""
+    var userSettings: UserSettings
     
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section(header: Text("OpenAI API Key"), footer: Text("Your API key is stored securely in the device keychain")) {
-                    VStack(spacing: 8) {
-                        if settings.apiKeyStored && !isEditingApiKey {
-                            HStack {
-                                Text(maskApiKey(apiKey))
-                                    .font(.system(.body, design: .monospaced))
-                                    .onAppear {
-                                        Logger.ui.debug("Loading API key for display in settings")
-                                        if let key = KeychainManager.shared.getApiKey() {
-                                            apiKey = key
-                                            Logger.ui.info("API key loaded and masked for display")
-                                        } else {
-                                            Logger.ui.error("Failed to load API key for display")
-                                        }
-                                    }
-                                
-                                Spacer()
-                                
-                                Button("Edit") {
-                                    Logger.ui.debug("User initiated API key editing")
-                                    isEditingApiKey = true
-                                }
-                                .buttonStyle(.bordered)
-                                .controlSize(.small)
-                            }
-                        } else {
-                            SecureField("Enter your OpenAI API Key", text: $apiKey)
-                                .autocorrectionDisabled()
-                                .textInputAutocapitalization(.never)
-                                .onAppear {
-                                    if settings.apiKeyStored && isEditingApiKey {
-                                        Logger.ui.debug("Loading API key for editing in settings")
-                                        if let key = KeychainManager.shared.getApiKey() {
-                                            apiKey = key
-                                            Logger.ui.info("API key loaded for editing")
-                                        } else {
-                                            Logger.ui.error("Failed to load API key for editing")
-                                        }
-                                    }
-                                }
-                            
-                            Button(action: saveApiKey) {
-                                Text(isEditingApiKey ? "Update API Key" : "Save API Key")
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .disabled(apiKey.isEmpty)
-                            
-                            if isEditingApiKey {
-                                Button("Cancel") {
-                                    Logger.ui.debug("User canceled API key editing")
-                                    isEditingApiKey = false
-                                    if let key = KeychainManager.shared.getApiKey() {
-                                        apiKey = key
-                                        Logger.ui.info("Restored original API key after canceling edit")
-                                    }
-                                }
-                                .frame(maxWidth: .infinity)
-                                .buttonStyle(.bordered)
-                            }
-                        }
-                    }
-                    
-                    if settings.apiKeyStored && !isEditingApiKey {
-                        Button(action: { 
-                            Logger.ui.debug("User requested API key deletion")
-                            apiKey = ""
-                            if KeychainManager.shared.deleteApiKey() {
-                                settings.apiKeyStored = false
-                                alertMessage = "API Key deleted successfully"
-                                showAlert = true
-                                Logger.ui.info("API key successfully deleted")
-                            } else {
-                                Logger.ui.error("Failed to delete API key")
-                            }
-                        }) {
-                            Text("Delete API Key")
-                                .foregroundStyle(.red)
-                        }
-                    }
-                }
-                
-                Section(header: Text("Idea Prompt"), footer: Text("This prompt will be used to generate ideas")) {
-                    TextEditor(text: $settings.ideaPrompt)
-                        .frame(minHeight: 100)
-                }
-            }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
-            }
-            .alert("Settings", isPresented: $showAlert) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text(alertMessage)
-            }
+    init(userSettings: UserSettings) {
+        self.userSettings = userSettings
+    }
+    
+    func loadApiKey() {
+        Logger.ui.debug("Loading API key for display in settings")
+        if let key = KeychainManager.shared.getApiKey() {
+            apiKey = key
+            Logger.ui.info("API key loaded and masked for display")
+        } else {
+            Logger.ui.error("Failed to load API key for display")
         }
     }
     
-    private func saveApiKey() {
+    func startEditing() {
+        Logger.ui.debug("User initiated API key editing")
+        isEditingApiKey = true
+        loadApiKey()
+    }
+    
+    func cancelEditing() {
+        Logger.ui.debug("User canceled API key editing")
+        isEditingApiKey = false
+        if let key = KeychainManager.shared.getApiKey() {
+            apiKey = key
+            Logger.ui.info("Restored original API key after canceling edit")
+        }
+    }
+    
+    func saveApiKey() {
         Logger.ui.debug("Attempting to save API key")
         if apiKey.isEmpty {
             Logger.ui.error("Cannot save empty API key")
@@ -132,7 +53,7 @@ struct SettingsView: View {
         }
         
         if KeychainManager.shared.saveApiKey(apiKey) {
-            settings.apiKeyStored = true
+            userSettings.apiKeyStored = true
             isEditingApiKey = false
             alertMessage = isEditingApiKey ? "API Key updated successfully" : "API Key saved successfully"
             showAlert = true
@@ -144,7 +65,20 @@ struct SettingsView: View {
         }
     }
     
-    private func maskApiKey(_ key: String) -> String {
+    func deleteApiKey() {
+        Logger.ui.debug("User requested API key deletion")
+        apiKey = ""
+        if KeychainManager.shared.deleteApiKey() {
+            userSettings.apiKeyStored = false
+            alertMessage = "API Key deleted successfully"
+            showAlert = true
+            Logger.ui.info("API key successfully deleted")
+        } else {
+            Logger.ui.error("Failed to delete API key")
+        }
+    }
+    
+    func maskApiKey(_ key: String) -> String {
         guard !key.isEmpty else { 
             Logger.ui.debug("Attempted to mask empty API key")
             return "" 
@@ -154,6 +88,128 @@ struct SettingsView: View {
         let prefix = String(key.prefix(4))
         let suffix = String(key.suffix(4))
         return "\(prefix)••••••••••••\(suffix)"
+    }
+}
+
+struct ApiKeyViewDisplay: View {
+    @ObservedObject var viewModel: SettingsViewModel
+    
+    var body: some View {
+        HStack {
+            Text(viewModel.maskApiKey(viewModel.apiKey))
+                .font(.system(.body, design: .monospaced))
+                .onAppear {
+                    viewModel.loadApiKey()
+                }
+            
+            Spacer()
+            
+            Button("Edit") {
+                viewModel.startEditing()
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        }
+    }
+}
+
+struct ApiKeyEditView: View {
+    @ObservedObject var viewModel: SettingsViewModel
+    
+    var body: some View {
+        VStack {
+            SecureField("Enter your OpenAI API Key", text: $viewModel.apiKey)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .onAppear {
+                    if viewModel.userSettings.apiKeyStored && viewModel.isEditingApiKey {
+                        viewModel.loadApiKey()
+                    }
+                }
+            
+            Button(action: { viewModel.saveApiKey() }) {
+                Text(viewModel.isEditingApiKey ? "Update API Key" : "Save API Key")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(viewModel.apiKey.isEmpty)
+            
+            if viewModel.isEditingApiKey {
+                Button("Cancel") {
+                    viewModel.cancelEditing()
+                }
+                .frame(maxWidth: .infinity)
+                .buttonStyle(.bordered)
+            }
+        }
+    }
+}
+
+struct ApiKeySection: View {
+    @ObservedObject var viewModel: SettingsViewModel
+    
+    var body: some View {
+        Section(header: Text("OpenAI API Key"), footer: Text("Your API key is stored securely in the device keychain")) {
+            VStack(spacing: 8) {
+                if viewModel.userSettings.apiKeyStored && !viewModel.isEditingApiKey {
+                    ApiKeyViewDisplay(viewModel: viewModel)
+                } else {
+                    ApiKeyEditView(viewModel: viewModel)
+                }
+            }
+            
+            if viewModel.userSettings.apiKeyStored && !viewModel.isEditingApiKey {
+                Button(action: { viewModel.deleteApiKey() }) {
+                    Text("Delete API Key")
+                        .foregroundStyle(.red)
+                }
+            }
+        }
+    }
+}
+
+struct IdeaPromptSection: View {
+    @ObservedObject var settings: UserSettings
+    
+    var body: some View {
+        Section(header: Text("Idea Prompt"), footer: Text("This prompt will be used to generate ideas")) {
+            TextEditor(text: $settings.ideaPrompt)
+                .frame(minHeight: 100)
+        }
+    }
+}
+
+struct SettingsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var settings: UserSettings
+    @StateObject private var viewModel: SettingsViewModel
+    
+    init() {
+        // Use StateObject to initialize the view model
+        _viewModel = StateObject(wrappedValue: SettingsViewModel(userSettings: UserSettings.shared))
+    }
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                ApiKeySection(viewModel: viewModel)
+                IdeaPromptSection(settings: settings)
+            }
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+            .alert("Settings", isPresented: $viewModel.showAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(viewModel.alertMessage)
+            }
+        }
     }
 }
 

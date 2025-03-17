@@ -21,39 +21,62 @@ struct UserSettingsTests {
     
     // Test setting the idea prompt property
     @Test func testSetIdeaPrompt() async throws {
-        // We'll just test that the property can be set correctly in memory
-        let settings = UserSettings.shared
+        // Create a test-specific UserDefaults instance
+        let testDefaults = UserDefaults(suiteName: "test_settings")!
+        testDefaults.removePersistentDomain(forName: "test_settings")
         
-        // Save original for restoration later
-        let originalPrompt = settings.ideaPrompt
+        // Create a test-specific UserSettings instance
+        let settings = UserSettings(defaults: testDefaults)
         
-        // Set a test prompt
-        let testPrompt = "Test prompt for unit testing"
-        settings.ideaPrompt = testPrompt
+        // Create and run test operations on the main thread
+        await MainActor.run {
+            // Save original for later comparison
+            let originalPrompt = settings.ideaPrompt
+            
+            // Set a test prompt
+            let testPrompt = "Test prompt for unit testing"
+            settings.ideaPrompt = testPrompt
+            
+            // Check it was assigned correctly
+            #expect(settings.ideaPrompt == testPrompt, "Idea prompt should be updated in memory")
+            
+            // Restore original
+            settings.ideaPrompt = originalPrompt
+        }
         
-        // Check it was assigned correctly
-        #expect(settings.ideaPrompt == testPrompt, "Idea prompt should be updated in memory")
-        
-        // Restore original
-        settings.ideaPrompt = originalPrompt
+        // Clean up
+        testDefaults.removePersistentDomain(forName: "test_settings")
     }
     
     // Test setting and persisting API key stored flag
     @Test func testSetApiKeyStored() async throws {
-        resetUserDefaults()
+        // Create a test-specific UserDefaults instance
+        let testDefaults = UserDefaults(suiteName: "test_settings")!
+        testDefaults.removePersistentDomain(forName: "test_settings")
         
-        let settings = UserSettings.shared
+        // Create a test-specific UserSettings instance
+        let settings = UserSettings(defaults: testDefaults)
         
-        // Verify default state
-        #expect(settings.apiKeyStored == false, "API key stored should default to false")
+        // Create and run test operations on the main thread
+        await MainActor.run {
+            // Verify default state
+            #expect(settings.apiKeyStored == false, "API key stored should default to false")
+            
+            // Set to true
+            settings.apiKeyStored = true
+            
+            // Verify changes
+            #expect(settings.apiKeyStored == true, "API key stored should be updated in memory")
+        }
         
-        // Set to true
-        settings.apiKeyStored = true
+        // Wait a moment for async UserDefaults operations to complete
+        try await Task.sleep(nanoseconds: 100_000_000)  // 0.1 seconds
         
-        // Verify changes
-        #expect(settings.apiKeyStored == true, "API key stored should be updated in memory")
-        #expect(UserDefaults.standard.bool(forKey: "apiKeyStored") == true, "API key stored should be saved to UserDefaults")
+        // Test that UserDefaults was updated
+        let storedValue = testDefaults.bool(forKey: "apiKeyStored")
+        #expect(storedValue == true, "API key stored should be saved to UserDefaults")
         
-        resetUserDefaults()
+        // Clean up
+        testDefaults.removePersistentDomain(forName: "test_settings")
     }
 }

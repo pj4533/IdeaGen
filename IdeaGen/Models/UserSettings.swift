@@ -17,14 +17,18 @@ class UserSettings: ObservableObject {
     @Published var ideaPrompt: String {
         didSet {
             Logger.settings.debug("Updating idea prompt in UserDefaults")
-            defaults.set(self.ideaPrompt, forKey: "ideaPrompt")
+            DispatchQueue.main.async {
+                self.defaults.set(self.ideaPrompt, forKey: "ideaPrompt")
+            }
         }
     }
     
     @Published var apiKeyStored: Bool {
         didSet {
             Logger.settings.debug("Updating apiKeyStored flag: \(self.apiKeyStored)")
-            defaults.set(self.apiKeyStored, forKey: "apiKeyStored")
+            DispatchQueue.main.async {
+                self.defaults.set(self.apiKeyStored, forKey: "apiKeyStored")
+            }
         }
     }
     
