@@ -14,19 +14,11 @@
 			remoteGlobalIDString = B01675252D88CB9C00AB760A;
 			remoteInfo = IdeaGen;
 		};
-		B01675412D88CB9D00AB760A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B016751E2D88CB9C00AB760A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B01675252D88CB9C00AB760A;
-			remoteInfo = IdeaGen;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		B01675262D88CB9C00AB760A /* IdeaGen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IdeaGen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B01675362D88CB9D00AB760A /* IdeaGenTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IdeaGenTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B01675402D88CB9D00AB760A /* IdeaGenUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IdeaGenUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -38,11 +30,6 @@
 		B01675392D88CB9D00AB760A /* IdeaGenTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = IdeaGenTests;
-			sourceTree = "<group>";
-		};
-		B01675432D88CB9D00AB760A /* IdeaGenUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = IdeaGenUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -62,13 +49,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B016753D2D88CB9D00AB760A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -77,7 +57,6 @@
 			children = (
 				B01675282D88CB9C00AB760A /* IdeaGen */,
 				B01675392D88CB9D00AB760A /* IdeaGenTests */,
-				B01675432D88CB9D00AB760A /* IdeaGenUITests */,
 				B01675272D88CB9C00AB760A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -87,7 +66,6 @@
 			children = (
 				B01675262D88CB9C00AB760A /* IdeaGen.app */,
 				B01675362D88CB9D00AB760A /* IdeaGenTests.xctest */,
-				B01675402D88CB9D00AB760A /* IdeaGenUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -140,29 +118,6 @@
 			productReference = B01675362D88CB9D00AB760A /* IdeaGenTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		B016753F2D88CB9D00AB760A /* IdeaGenUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B01675502D88CB9D00AB760A /* Build configuration list for PBXNativeTarget "IdeaGenUITests" */;
-			buildPhases = (
-				B016753C2D88CB9D00AB760A /* Sources */,
-				B016753D2D88CB9D00AB760A /* Frameworks */,
-				B016753E2D88CB9D00AB760A /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				B01675422D88CB9D00AB760A /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				B01675432D88CB9D00AB760A /* IdeaGenUITests */,
-			);
-			name = IdeaGenUITests;
-			packageProductDependencies = (
-			);
-			productName = IdeaGenUITests;
-			productReference = B01675402D88CB9D00AB760A /* IdeaGenUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -177,10 +132,6 @@
 						CreatedOnToolsVersion = 16.2;
 					};
 					B01675352D88CB9D00AB760A = {
-						CreatedOnToolsVersion = 16.2;
-						TestTargetID = B01675252D88CB9C00AB760A;
-					};
-					B016753F2D88CB9D00AB760A = {
 						CreatedOnToolsVersion = 16.2;
 						TestTargetID = B01675252D88CB9C00AB760A;
 					};
@@ -202,7 +153,6 @@
 			targets = (
 				B01675252D88CB9C00AB760A /* IdeaGen */,
 				B01675352D88CB9D00AB760A /* IdeaGenTests */,
-				B016753F2D88CB9D00AB760A /* IdeaGenUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -216,13 +166,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B01675342D88CB9D00AB760A /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B016753E2D88CB9D00AB760A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -246,13 +189,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B016753C2D88CB9D00AB760A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -260,11 +196,6 @@
 			isa = PBXTargetDependency;
 			target = B01675252D88CB9C00AB760A /* IdeaGen */;
 			targetProxy = B01675372D88CB9D00AB760A /* PBXContainerItemProxy */;
-		};
-		B01675422D88CB9D00AB760A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B01675252D88CB9C00AB760A /* IdeaGen */;
-			targetProxy = B01675412D88CB9D00AB760A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -484,40 +415,6 @@
 			};
 			name = Release;
 		};
-		B01675512D88CB9D00AB760A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = U3FNBSFU75;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.saygoodnight.IdeaGenUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = IdeaGen;
-			};
-			name = Debug;
-		};
-		B01675522D88CB9D00AB760A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = U3FNBSFU75;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.saygoodnight.IdeaGenUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = IdeaGen;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -544,15 +441,6 @@
 			buildConfigurations = (
 				B016754E2D88CB9D00AB760A /* Debug */,
 				B016754F2D88CB9D00AB760A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		B01675502D88CB9D00AB760A /* Build configuration list for PBXNativeTarget "IdeaGenUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B01675512D88CB9D00AB760A /* Debug */,
-				B01675522D88CB9D00AB760A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
