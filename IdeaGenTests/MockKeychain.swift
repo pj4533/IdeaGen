@@ -8,27 +8,28 @@
 import Foundation
 @testable import IdeaGen
 
-/// A mock implementation of the KeychainManager for testing purposes
+/// A mock implementation of KeychainManager for testing purposes
 class MockKeychainManager {
     static let shared = MockKeychainManager()
     
     private var storage: [String: String] = [:]
+    private let storageKey = "OpenAIApiKey"
     
     private init() {}
     
     func saveApiKey(_ key: String) -> Bool {
         guard !key.isEmpty else { return false }
         
-        storage["OpenAIApiKey"] = key
+        storage[storageKey] = key
         return true
     }
     
     func getApiKey() -> String? {
-        return storage["OpenAIApiKey"]
+        return storage[storageKey]
     }
     
     func deleteApiKey() -> Bool {
-        storage.removeValue(forKey: "OpenAIApiKey")
+        storage.removeValue(forKey: storageKey)
         return true
     }
     
