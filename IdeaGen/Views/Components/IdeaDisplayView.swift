@@ -11,6 +11,7 @@ import OSLog
 struct IdeaDisplayView: View {
     let idea: Idea
     var onClear: () -> Void
+    var isGenerating: Bool
     @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
@@ -30,6 +31,8 @@ struct IdeaDisplayView: View {
                         .lineLimit(nil)
                         .fixedSize(horizontal: false, vertical: true)
                         .lineSpacing(6)
+                        .blur(radius: isGenerating ? 10 : 0)
+                        .animation(.easeInOut(duration: 0.5), value: isGenerating)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
@@ -41,6 +44,7 @@ struct IdeaDisplayView: View {
 #Preview {
     IdeaDisplayView(
         idea: Idea(content: "TaskFlow\n\nA productivity app that uses AI to intelligently organize and prioritize your tasks based on deadlines, importance, and your work habits. It integrates with calendars and uses adaptive learning to suggest optimal times for focused work."),
-        onClear: {}
+        onClear: {},
+        isGenerating: false
     )
 }

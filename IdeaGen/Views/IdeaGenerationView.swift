@@ -22,12 +22,14 @@ struct IdeaGenerationView: View {
             VStack {
                 ZStack {
                     if let idea = viewModel.currentIdea {
-                        // Display the idea with blur animation
-                        IdeaDisplayView(idea: idea) {
-                            viewModel.clearIdea()
-                        }
-                        .blur(radius: viewModel.isGenerating ? 10 : 0)
-                        .animation(.easeInOut(duration: 0.5), value: viewModel.isGenerating)
+                        // Display the idea with selective blur animation on content
+                        IdeaDisplayView(
+                            idea: idea, 
+                            onClear: {
+                                viewModel.clearIdea()
+                            },
+                            isGenerating: viewModel.isGenerating
+                        )
                     } else {
                         // Show placeholder when no idea is generated
                         EmptyStateView()
