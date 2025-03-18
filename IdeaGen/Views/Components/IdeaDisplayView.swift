@@ -25,8 +25,10 @@ struct IdeaDisplayView: View {
                     let components = IdeaContentParser.parse(idea.content)
                     
                     Text(idea.content)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(.system(size: 28, weight: .bold, design: .default))
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
                         .lineSpacing(6)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
