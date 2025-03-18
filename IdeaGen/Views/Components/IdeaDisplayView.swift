@@ -21,39 +21,41 @@ struct IdeaDisplayView: View {
                 .foregroundColor(.secondary)
             
             ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    // Parse the idea content to extract the title and description
-                    let components = IdeaContentParser.parse(idea.content)
+                ZStack(alignment: .center) {
+                    // Idea content text
+                    VStack(alignment: .leading, spacing: 12) {
+                        // Parse the idea content to extract the title and description
+                        let components = IdeaContentParser.parse(idea.content)
+                        
+                        Text(idea.content)
+                            .font(.system(size: 28, weight: .bold, design: .default))
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineSpacing(6)
+                            .blur(radius: isGenerating ? 30 : 0)
+                            .opacity(isGenerating ? 0.2 : 1)
+                            .animation(.easeInOut(duration: 0.2), value: isGenerating)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
                     
-                    Text(idea.content)
-                        .font(.system(size: 28, weight: .bold, design: .default))
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(nil)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .lineSpacing(6)
-                        .blur(radius: isGenerating ? 30 : 0)
-                        .opacity(isGenerating ? 0.2 : 1)
-                        .animation(.easeInOut(duration: 0.2), value: isGenerating)
-                        .overlay(
-                            Group {
-                                if isGenerating {
-                                    ZStack {
-                                        Image(systemName: "lightbulb.fill")
-                                            .font(.system(size: 40))
-                                            .foregroundColor(.yellow)
-                                            .symbolEffect(.pulse.byLayer, options: .repeating)
-                                        
-                                        Image(systemName: "sparkles")
-                                            .font(.system(size: 50))
-                                            .foregroundColor(.orange.opacity(0.7))
-                                            .symbolEffect(.bounce.up.byLayer, options: .repeating)
-                                    }
-                                }
-                            }
-                        )
+                    // Loading animation - fixed position
+                    if isGenerating {
+                        ZStack {
+                            Image(systemName: "lightbulb.fill")
+                                .font(.system(size: 40))
+                                .foregroundColor(.yellow)
+                                .symbolEffect(.pulse.byLayer, options: .repeating)
+                            
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 50))
+                                .foregroundColor(.orange.opacity(0.7))
+                                .symbolEffect(.bounce.up.byLayer, options: .repeating)
+                        }
+                        .transition(.opacity)
+                    }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
             }
         }
     }
