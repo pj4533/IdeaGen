@@ -48,15 +48,12 @@ actor OpenAIService: OpenAIServiceProtocol {
             return .failure(.noApiKey)
         }
         
-        // Construct the full prompt with additional context
-        let fullPrompt = buildPrompt(prompt: prompt)
-        
         // Create the request body
         let requestBody = OpenAICompletionsRequest(
             model: model,
             messages: [
                 .system(OpenAICompletionsRequest.ideaGenerationIntro),
-                .user(fullPrompt)
+                .user(prompt)
             ],
             temperature: temperature,
             maxTokens: maxTokens,
@@ -160,12 +157,6 @@ actor OpenAIService: OpenAIServiceProtocol {
         }
     }
     
-    // MARK: - Private Helper Methods
-    
-    private func buildPrompt(prompt: String) -> String {
-        // Add formatting instructions to the prompt
-        return "Here is the basis for the idea you should generate: \(prompt)"
-    }
 }
 
 // MARK: - Helper Extensions

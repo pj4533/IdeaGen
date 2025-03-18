@@ -22,6 +22,7 @@ final class IdeaGenerationViewModel: ObservableObject, Sendable {
     
     private let openAIService: OpenAIServiceProtocol
     private let userSettings: UserSettings
+    private var generatedIdeas: [Idea] = []
     
     // MARK: - Initialization
     
@@ -60,14 +61,19 @@ final class IdeaGenerationViewModel: ObservableObject, Sendable {
         
         // Generate the idea asynchronously
         Task {
-            Logger.app.info("Generating idea with prompt: \(prompt)")
+            // Create enhanced prompt with previous ideas
+            let enhancedPrompt = createEnhancedPrompt(basePrompt: prompt)
+            Logger.app.info("Generating idea with enhanced prompt that includes previous idea history")
             
-            let result = await openAIService.generateIdea(prompt: prompt)
+            let result = await openAIService.generateIdea(prompt: enhancedPrompt)
             
             switch result {
             case .success(let idea):
                 Logger.app.info("Successfully generated idea: \(idea.content)")
                 currentIdea = idea
+                // Store the generated idea for future reference
+                self.generatedIdeas.append(idea)
+                Logger.app.debug("Added idea to history, total ideas: \(self.generatedIdeas.count)")
                 isGenerating = false
                 
             case .failure(let ideaError):
@@ -83,5 +89,31 @@ final class IdeaGenerationViewModel: ObservableObject, Sendable {
     func clearIdea() {
         Logger.app.debug("Clearing current idea")
         currentIdea = nil
+    }
+    
+    // MARK: - Private Helper Methods
+    
+    /// Creates an enhanced prompt that includes previously generated ideas
+    /// - Parameter basePrompt: The original user prompt
+    /// - Returns: Enhanced prompt with instructions to generate different ideas
+    private func createEnhancedPrompt(basePrompt: String) -> String {
+        var enhancedPrompt = "Here is the basis for the idea you should generate: \(basePrompt)"
+        
+        // Only add previous ideas if we have some
+        if !self.generatedIdeas.isEmpty {
+            // Start with the instruction
+            enhancedPrompt += "\n\nMake sure the idea is significantly different than each of these: "
+            
+            // Add each previous idea
+            let previousIdeasText = self.generatedIdeas
+                .map { $0.content }
+                .joined(separator: ", ")
+            
+            enhancedPrompt += previousIdeasText
+            
+            Logger.app.debug("Enhanced prompt with \(self.generatedIdeas.count) previous ideas")
+        }
+        
+        return enhancedPrompt
     }
 }
