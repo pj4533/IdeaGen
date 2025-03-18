@@ -9,7 +9,7 @@ import Foundation
 import OSLog
 
 /// Protocol defining the interface for managing saved ideas
-protocol SavedIdeasManaging {
+protocol SavedIdeasManaging: Sendable {
     func saveIdea(_ idea: Idea) throws
     func getAllIdeas() -> [Idea]
     func updateIdea(_ idea: Idea) throws
@@ -21,13 +21,13 @@ protocol SavedIdeasManaging {
 final class SavedIdeasManager: SavedIdeasManaging {
     // MARK: - Properties
     
-    private let userDefaults: UserDefaults
+    // Use UserDefaults directly from methods instead of storing as a property
     private let savedIdeasKey = "savedIdeas"
     
     // MARK: - Initialization
     
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init() {
+        // No stored properties needed
     }
     
     // MARK: - SavedIdeasManaging Implementation
@@ -51,7 +51,7 @@ final class SavedIdeasManager: SavedIdeasManaging {
     /// Retrieves all saved ideas from storage
     /// - Returns: Array of saved ideas, sorted by created date (newest first)
     func getAllIdeas() -> [Idea] {
-        guard let data = userDefaults.data(forKey: savedIdeasKey) else {
+        guard let data = UserDefaults.standard.data(forKey: savedIdeasKey) else {
             Logger.storage.debug("No saved ideas found")
             return []
         }
@@ -102,7 +102,7 @@ final class SavedIdeasManager: SavedIdeasManaging {
     private func saveIdeasToStorage(_ ideas: [Idea]) throws {
         do {
             let data = try JSONEncoder().encode(ideas)
-            userDefaults.set(data, forKey: savedIdeasKey)
+            UserDefaults.standard.set(data, forKey: savedIdeasKey)
             Logger.storage.debug("Successfully saved \(ideas.count) ideas to storage")
         } catch {
             Logger.storage.error("Failed to encode ideas for storage: \(error.localizedDescription)")
@@ -117,7 +117,7 @@ enum SavedIdeasError: Error, LocalizedError {
     case encodingError
     case decodingError
     
-    var errorDescription: String? {
+    nonisolated var errorDescription: String? {
         switch self {
         case .ideaNotFound:
             return "The requested idea could not be found"

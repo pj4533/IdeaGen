@@ -10,7 +10,7 @@ import SwiftUI
 import OSLog
 
 @MainActor
-final class IdeaGenerationViewModel: ObservableObject, Sendable {
+final class IdeaGenerationViewModel: ObservableObject {
     // MARK: - Published Properties
     
     @Published var currentIdea: Idea?

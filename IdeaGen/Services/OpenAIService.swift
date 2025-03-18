@@ -17,7 +17,7 @@ protocol OpenAIServiceProtocol: Sendable {
 }
 
 /// Implementation of the OpenAI service
-actor OpenAIService: OpenAIServiceProtocol {
+final class OpenAIService: OpenAIServiceProtocol {
     // Use singleton pattern for shared instance
     static let shared = OpenAIService()
     
@@ -29,6 +29,8 @@ actor OpenAIService: OpenAIServiceProtocol {
     // Configuration for idea generation
     private let temperature: Float = 0.8
     private let maxTokens: Int = 1000
+    
+    // Task isolation needed for Swift 6 concurrency
     
     init(keychainManager: KeychainManaging = KeychainManager.shared,
          urlSession: URLSession = .shared) {
@@ -43,7 +45,7 @@ actor OpenAIService: OpenAIServiceProtocol {
         Logger.prompt.info("User prompt: \(prompt)")
         
         // First, get the API key
-        guard let apiKey = await keychainManager.getApiKey() else {
+        guard let apiKey = keychainManager.getApiKey() else {
             Logger.network.error("No API key found for OpenAI service")
             return .failure(.noApiKey)
         }

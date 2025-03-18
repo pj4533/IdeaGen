@@ -11,7 +11,7 @@ import OSLog
 
 // Mark UserSettings as MainActor since it deals with UI state
 @MainActor
-final class UserSettings: ObservableObject, Sendable {
+final class UserSettings: ObservableObject, @unchecked Sendable {
     static let shared = UserSettings()
     
     // UserDefaults is thread-safe for reading

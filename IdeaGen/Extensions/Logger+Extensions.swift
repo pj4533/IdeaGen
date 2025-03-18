@@ -32,4 +32,7 @@ extension Logger {
     
     // Saved ideas storage and management
     static let storage = Logger(subsystem: subsystem, category: "storage")
+    
+    // Concurrency and actor related issues
+    static let concurrency = Logger(subsystem: subsystem, category: "concurrency")
 }

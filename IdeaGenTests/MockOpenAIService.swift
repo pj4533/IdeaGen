@@ -9,7 +9,7 @@ import Foundation
 @testable import IdeaGen
 
 /// Mock implementation of the OpenAI service for testing
-actor MockOpenAIService: OpenAIServiceProtocol {
+final class MockOpenAIService: OpenAIServiceProtocol {
     enum SimulationMode {
         case success
         case failure(IdeaGenerationError)
