@@ -32,20 +32,6 @@ struct IdeaDisplayView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
             }
-            
-            HStack {
-                Spacer()
-                
-                Button(action: {
-                    Logger.ui.debug("Clear idea button tapped")
-                    onClear()
-                }) {
-                    Text("Clear")
-                        .frame(minWidth: 80)
-                }
-                .buttonStyle(.bordered)
-            }
-            .padding(.top, 8)
         }
     }
 }
