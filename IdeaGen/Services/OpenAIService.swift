@@ -142,8 +142,6 @@ actor OpenAIService: OpenAIServiceProtocol {
                 return .failure(.invalidResponse)
             }
             
-            // Create and return the idea
-            Logger.prompt.info("Generated idea: \(content)")
             let idea = Idea(content: content)
             return .success(idea)
             
