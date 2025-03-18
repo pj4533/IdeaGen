@@ -152,7 +152,7 @@ actor OpenAIService: OpenAIServiceProtocol {
     
     private func buildPrompt(prompt: String) -> String {
         // Add formatting instructions to the prompt
-        return "Generate a single short idea. Dont not give the idea a name, only provide the text of the idea. Keep the idea quick and short. One sentence max. Do not use any markdown or other styling. Here is the basis for the idea you should generate: \(prompt)"
+        return "Here is the basis for the idea you should generate: \(prompt)"
     }
 }
 

@@ -79,7 +79,7 @@ struct OpenAICompletionsRequest: Codable, Sendable {
     let responseFormat: ResponseFormat?
     
     // Fixed system message for idea generation
-    static let ideaGenerationIntro = "You will be given a prompt to generate creative app ideas. Respond only with the idea itself, no introduction or explanation. Be direct, creative and specific. Include a concise name for the app as the first line."
+    static let ideaGenerationIntro = "Generate a single short idea. Dont not give the idea a name, only provide the text of the idea. Keep the idea quick and short. One sentence max. Do not use any markdown or other styling."
     
     enum CodingKeys: String, CodingKey {
         case model, messages, temperature
