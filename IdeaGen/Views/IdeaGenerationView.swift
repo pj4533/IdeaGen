@@ -20,14 +20,18 @@ struct IdeaGenerationView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                if let idea = viewModel.currentIdea {
-                    // Display the idea
-                    IdeaDisplayView(idea: idea) {
-                        viewModel.clearIdea()
+                ZStack {
+                    if let idea = viewModel.currentIdea {
+                        // Display the idea with blur animation
+                        IdeaDisplayView(idea: idea) {
+                            viewModel.clearIdea()
+                        }
+                        .blur(radius: viewModel.isGenerating ? 10 : 0)
+                        .animation(.easeInOut(duration: 0.5), value: viewModel.isGenerating)
+                    } else {
+                        // Show placeholder when no idea is generated
+                        EmptyStateView()
                     }
-                } else {
-                    // Show placeholder when no idea is generated
-                    EmptyStateView()
                 }
                 
                 // Generate button
