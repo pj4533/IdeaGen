@@ -79,7 +79,19 @@ struct OpenAICompletionsRequest: Codable, Sendable {
     let responseFormat: ResponseFormat?
     
     // Fixed system message for idea generation
-    static let ideaGenerationIntro = "Generate a single short idea. Dont not give the idea a name, only provide the text of the idea. Keep the idea quick and short. One sentence max. Do not use any markdown or other styling."
+    static let ideaGenerationIntro = """
+Generate a single short idea. 
+- Don't include any part of the prompt in the idea you generate. 
+- Keep it descriptive to the idea only. 
+- Dont not give the idea a name, only provide the text of the idea.
+- Keep the idea quick and short. One sentence max. 
+- Do not use any markdown or other styling.
+
+EXAMPLE:
+User: "Here is the basis for the idea you should generate: a cli tool for developers"
+
+Assistant: "automatically generate and update project documentation by scanning code comments and structure."
+"""
     
     enum CodingKeys: String, CodingKey {
         case model, messages, temperature
