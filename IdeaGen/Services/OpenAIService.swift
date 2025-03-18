@@ -50,7 +50,6 @@ actor OpenAIService: OpenAIServiceProtocol {
         
         // Construct the full prompt with additional context
         let fullPrompt = buildPrompt(prompt: prompt)
-        Logger.prompt.info("Full prompt to OpenAI: \(fullPrompt)")
         
         // Create the request body
         let requestBody = OpenAICompletionsRequest(
@@ -63,6 +62,18 @@ actor OpenAIService: OpenAIServiceProtocol {
             maxTokens: maxTokens,
             responseFormat: nil
         )
+        
+        // Log the full request JSON for debugging
+        do {
+            let jsonEncoder = JSONEncoder()
+            jsonEncoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            let prettyJsonData = try jsonEncoder.encode(requestBody)
+            if let jsonString = String(data: prettyJsonData, encoding: .utf8) {
+                Logger.prompt.info("OpenAI Request: \(jsonString)")
+            }
+        } catch {
+            Logger.prompt.error("Failed to log request JSON: \(error.localizedDescription)")
+        }
         
         do {
             // Convert the request to JSON data
@@ -135,7 +146,6 @@ actor OpenAIService: OpenAIServiceProtocol {
             }
             
             // Create and return the idea
-            Logger.network.info("Successfully generated idea with OpenAI API")
             Logger.prompt.info("Generated idea: \(content)")
             let idea = Idea(content: content)
             return .success(idea)
