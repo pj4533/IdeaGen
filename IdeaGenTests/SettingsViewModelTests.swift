@@ -15,7 +15,7 @@ import os.log
 struct SettingsViewModelTests {
     
     // Test masking API key functionality - nonisolated function can be tested directly
-    @Test func testMaskApiKey() async {
+    @Test func testMaskApiKey() async throws {
         // Create UserSettings on MainActor for test only - No need to run separately
         let userSettings = UserSettings()
         
@@ -39,7 +39,7 @@ struct SettingsViewModelTests {
     }
     
     // Test editing state management
-    @Test func testEditingStateManagement() async {
+    @Test func testEditingStateManagement() async throws {
         // Create UserSettings and ViewModel on MainActor
         let userSettings = UserSettings()
         let viewModel = SettingsViewModel(userSettings: userSettings)
@@ -70,7 +70,7 @@ struct SettingsViewModelTests {
     }
     
     // Test alert messages
-    @Test func testAlertMessages() async {
+    @Test func testAlertMessages() async throws {
         // Create UserSettings and ViewModel on MainActor
         let userSettings = UserSettings()
         let viewModel = SettingsViewModel(userSettings: userSettings)

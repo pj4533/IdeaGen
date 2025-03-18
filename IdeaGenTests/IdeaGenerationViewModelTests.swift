@@ -8,20 +8,20 @@
 import Testing
 import Foundation
 import SwiftUI
-import XCTest
 @testable import IdeaGen
 
 struct IdeaGenerationViewModelTests {
     
     @MainActor
-    @Test func testGenerateIdeaSuccess() async {
+    @Test func testGenerateIdeaSuccess() async throws {
         // Arrange
         let mockOpenAIService = MockOpenAIService()
         let testPrompt = "a creative app idea that solves real problems"
         let testIdea = Idea(content: "TestApp\n\nA test app for unit testing")
         await mockOpenAIService.setPredefinedIdea(testIdea)
         
-        let testDefaults = UserDefaults(suiteName: "test_defaults_\(UUID().uuidString)")!
+        let suiteName = "test_defaults_\(UUID().uuidString)"
+        let testDefaults = UserDefaults(suiteName: suiteName)!
         testDefaults.set(testPrompt, forKey: "ideaPrompt")
         testDefaults.set(true, forKey: "apiKeyStored")
         
@@ -32,28 +32,29 @@ struct IdeaGenerationViewModelTests {
         viewModel.generateIdea()
         
         // Allow time for the async task to complete
-        await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         
         // Assert
-        XCTAssertEqual(viewModel.currentIdea?.content, testIdea.content, "ViewModel should have updated with the test idea")
-        XCTAssertFalse(viewModel.isGenerating, "Generation should be complete")
-        XCTAssertNil(viewModel.error, "There should be no error")
-        XCTAssertFalse(viewModel.showError, "Error alert should not be shown")
+        #expect(viewModel.currentIdea?.content == testIdea.content, "ViewModel should have updated with the test idea")
+        #expect(viewModel.isGenerating == false, "Generation should be complete")
+        #expect(viewModel.error == nil, "There should be no error")
+        #expect(viewModel.showError == false, "Error alert should not be shown")
         
         let callCount = await mockOpenAIService.callCount
-        XCTAssertEqual(callCount, 1, "OpenAI service should have been called once")
+        #expect(callCount == 1, "OpenAI service should have been called once")
         
         // Clean up
-        testDefaults.removePersistentDomain(forName: testDefaults.suiteName!)
+        testDefaults.removePersistentDomain(forName: suiteName)
     }
     
     @MainActor
-    @Test func testGenerateIdeaFailure() async {
+    @Test func testGenerateIdeaFailure() async throws {
         // Arrange
         let mockOpenAIService = MockOpenAIService()
         await mockOpenAIService.setSimulationMode(.failure(.networkError("Network connection failed")))
         
-        let testDefaults = UserDefaults(suiteName: "test_defaults_\(UUID().uuidString)")!
+        let suiteName = "test_defaults_\(UUID().uuidString)"
+        let testDefaults = UserDefaults(suiteName: suiteName)!
         testDefaults.set("test prompt", forKey: "ideaPrompt")
         testDefaults.set(true, forKey: "apiKeyStored")
         
@@ -64,32 +65,34 @@ struct IdeaGenerationViewModelTests {
         viewModel.generateIdea()
         
         // Allow time for the async task to complete
-        await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         
         // Assert
-        XCTAssertNil(viewModel.currentIdea, "No idea should be set")
-        XCTAssertFalse(viewModel.isGenerating, "Generation should be complete")
-        XCTAssertNotNil(viewModel.error, "There should be an error")
-        XCTAssertTrue(viewModel.showError, "Error alert should be shown")
+        #expect(viewModel.currentIdea == nil, "No idea should be set")
+        #expect(viewModel.isGenerating == false, "Generation should be complete")
+        #expect(viewModel.error != nil, "There should be an error")
+        #expect(viewModel.showError == true, "Error alert should be shown")
         
         let callCount = await mockOpenAIService.callCount
-        XCTAssertEqual(callCount, 1, "OpenAI service should have been called once")
+        #expect(callCount == 1, "OpenAI service should have been called once")
         
-        guard case .networkError = viewModel.error else {
-            XCTFail("Error should be networkError but was \(String(describing: viewModel.error))")
-            return
+        if case .networkError = viewModel.error {
+            // Error is of the expected type
+        } else {
+            #expect(false, "Error should be networkError but was \(String(describing: viewModel.error))")
         }
         
         // Clean up
-        testDefaults.removePersistentDomain(forName: testDefaults.suiteName!)
+        testDefaults.removePersistentDomain(forName: suiteName)
     }
     
     @MainActor
-    @Test func testGenerateIdeaNoAPIKey() async {
+    @Test func testGenerateIdeaNoAPIKey() async throws {
         // Arrange
         let mockOpenAIService = MockOpenAIService()
         
-        let testDefaults = UserDefaults(suiteName: "test_defaults_\(UUID().uuidString)")!
+        let suiteName = "test_defaults_\(UUID().uuidString)"
+        let testDefaults = UserDefaults(suiteName: suiteName)!
         testDefaults.set("test prompt", forKey: "ideaPrompt")
         testDefaults.set(false, forKey: "apiKeyStored") // No API key stored
         
@@ -100,25 +103,26 @@ struct IdeaGenerationViewModelTests {
         viewModel.generateIdea()
         
         // Assert - this happens synchronously since we check for API key before making async call
-        XCTAssertNil(viewModel.currentIdea, "No idea should be set")
-        XCTAssertFalse(viewModel.isGenerating, "Generation should not start")
-        XCTAssertEqual(viewModel.error, .noApiKey, "Error should be noApiKey")
-        XCTAssertTrue(viewModel.showError, "Error alert should be shown")
+        #expect(viewModel.currentIdea == nil, "No idea should be set")
+        #expect(viewModel.isGenerating == false, "Generation should not start")
+        #expect(viewModel.error == .noApiKey, "Error should be noApiKey")
+        #expect(viewModel.showError == true, "Error alert should be shown")
         
         let callCount = await mockOpenAIService.callCount
-        XCTAssertEqual(callCount, 0, "OpenAI service should not have been called")
+        #expect(callCount == 0, "OpenAI service should not have been called")
         
         // Clean up
-        testDefaults.removePersistentDomain(forName: testDefaults.suiteName!)
+        testDefaults.removePersistentDomain(forName: suiteName)
     }
     
     @MainActor
-    @Test func testClearIdea() async {
+    @Test func testClearIdea() async throws {
         // Arrange
         let mockOpenAIService = MockOpenAIService()
         let testIdea = Idea(content: "Test idea content")
         
-        let testDefaults = UserDefaults(suiteName: "test_defaults_\(UUID().uuidString)")!
+        let suiteName = "test_defaults_\(UUID().uuidString)"
+        let testDefaults = UserDefaults(suiteName: suiteName)!
         let userSettings = UserSettings(defaults: testDefaults)
         let viewModel = IdeaGenerationViewModel(openAIService: mockOpenAIService, userSettings: userSettings)
         
@@ -129,9 +133,9 @@ struct IdeaGenerationViewModelTests {
         viewModel.clearIdea()
         
         // Assert
-        XCTAssertNil(viewModel.currentIdea, "Idea should be cleared")
+        #expect(viewModel.currentIdea == nil, "Idea should be cleared")
         
         // Clean up
-        testDefaults.removePersistentDomain(forName: testDefaults.suiteName!)
+        testDefaults.removePersistentDomain(forName: suiteName)
     }
 }

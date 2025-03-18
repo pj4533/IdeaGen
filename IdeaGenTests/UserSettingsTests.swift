@@ -71,7 +71,11 @@ struct UserSettingsTests {
         // Wait a moment for async UserDefaults operations to complete
         // This can run off the MainActor
         await Task {
-            try? await Task.sleep(nanoseconds: 200_000_000)  // 0.2 seconds
+            do {
+                try await Task.sleep(nanoseconds: 200_000_000)  // 0.2 seconds
+            } catch {
+                // Handle error if needed
+            }
         }.value
         
         // Test that UserDefaults was updated - still on MainActor

@@ -10,6 +10,15 @@
 - Build from command line: `xcodebuild -project IdeaGen.xcodeproj -scheme IdeaGen -configuration Debug -destination "platform=iOS Simulator,name=iPhone 16 Pro" build`
 - Run tests from command line: `xcodebuild -project IdeaGen.xcodeproj -scheme IdeaGen -configuration Debug -destination "platform=iOS Simulator,name=iPhone 16 Pro" test`
 
+## Testing Framework
+- Use **SwiftTesting** instead of XCTest for all tests
+- Import the Testing framework: `import Testing`
+- Mark test functions with `@Test` macro
+- Test suites should be structs, not XCTestCase subclasses
+- Use `#expect(condition)` instead of XCTAssert functions
+- Use `#require(value)` to unwrap and verify non-nil values
+- For expected errors, use `#expect(throws: ErrorType.self) { ... }`
+
 ## Code Style Guidelines
 - **Imports**: Group imports with SwiftUI first, then alphabetically
 - **Formatting**: 4-space indentation, 100-character line limit
