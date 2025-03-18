@@ -45,7 +45,7 @@ class MockURLProtocol: URLProtocol {
                     totalTokens: 150
                 ),
                 created: Int(Date().timeIntervalSince1970),
-                model: "gpt-4o-mini"
+                model: "gpt-4o"
             )
             
             let data = try! JSONEncoder().encode(responseObj)

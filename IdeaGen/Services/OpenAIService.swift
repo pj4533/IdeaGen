@@ -22,7 +22,7 @@ actor OpenAIService: OpenAIServiceProtocol {
     static let shared = OpenAIService()
     
     private let baseURL = "https://api.openai.com/v1/chat/completions"
-    private let model = "gpt-4o-mini" // Default model
+    private let model = "gpt-4o" // Default model
     private let keychainManager: KeychainManaging
     private let urlSession: URLSession
     
