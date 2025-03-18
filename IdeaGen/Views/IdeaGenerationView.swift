@@ -31,8 +31,8 @@ struct IdeaGenerationView: View {
                             isGenerating: viewModel.isGenerating
                         )
                     } else {
-                        // Show placeholder when no idea is generated
-                        EmptyStateView()
+                        // Show placeholder with matching layout when no idea is generated
+                        EmptyStateView(isGenerating: viewModel.isGenerating)
                     }
                 }
                 
