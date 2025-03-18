@@ -151,9 +151,8 @@ actor OpenAIService: OpenAIServiceProtocol {
     // MARK: - Private Helper Methods
     
     private func buildPrompt(prompt: String) -> String {
-        // Here we can add any additional context or instructions
-        // to enhance the idea generation
-        return prompt
+        // Add formatting instructions to the prompt
+        return "Generate a single short idea. Dont not give the idea a name, only provide the text of the idea. Keep the idea quick and short. One sentence max. Do not use any markdown or other styling. Here is the basis for the idea you should generate: \(prompt)"
     }
 }
 
