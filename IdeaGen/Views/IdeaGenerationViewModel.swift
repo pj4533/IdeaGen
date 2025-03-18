@@ -76,7 +76,7 @@ final class IdeaGenerationViewModel: ObservableObject, Sendable {
                 Logger.app.debug("Added idea to history, total ideas: \(self.generatedIdeas.count)")
                 
                 // Add a small delay for the animation to be noticeable
-                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
                 isGenerating = false
                 
             case .failure(let ideaError):

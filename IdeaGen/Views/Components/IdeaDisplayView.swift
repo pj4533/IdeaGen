@@ -31,8 +31,9 @@ struct IdeaDisplayView: View {
                         .lineLimit(nil)
                         .fixedSize(horizontal: false, vertical: true)
                         .lineSpacing(6)
-                        .blur(radius: isGenerating ? 10 : 0)
-                        .animation(.easeInOut(duration: 0.5), value: isGenerating)
+                        .blur(radius: isGenerating ? 30 : 0)
+                        .opacity(isGenerating ? 0.2 : 1)
+                        .animation(.easeInOut(duration: 0.3), value: isGenerating)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
