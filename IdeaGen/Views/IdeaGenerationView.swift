@@ -25,12 +25,8 @@ struct IdeaGenerationView: View {
                         // Display the idea with selective blur animation on content
                         IdeaDisplayView(
                             idea: idea, 
-                            onClear: {
-                                viewModel.clearIdea()
-                            },
-                            onSave: {
-                                viewModel.saveCurrentIdea()
-                            },
+                            onClear: viewModel.clearIdea,
+                            onSave: viewModel.saveCurrentIdea,
                             isGenerating: viewModel.isGenerating
                         )
                     } else {

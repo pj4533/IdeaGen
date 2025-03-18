@@ -32,25 +32,25 @@ final class SavedIdeasViewModel: ObservableObject {
     
     /// Loads all saved ideas from storage
     func loadSavedIdeas() async {
-        Logger.app.debug("Loading saved ideas")
+        Logger.storage.debug("Loading saved ideas")
         isLoading = true
         
         savedIdeas = savedIdeasManager.getAllIdeas()
         
         isLoading = false
-        Logger.app.info("Loaded \(savedIdeas.count) saved ideas")
+        Logger.storage.info("Loaded \(savedIdeas.count) saved ideas")
     }
     
     /// Saves a new idea to storage
     /// - Parameter idea: The idea to save
     func saveIdea(_ idea: Idea) async throws {
-        Logger.app.debug("Saving idea: \(idea.id)")
+        Logger.storage.debug("Saving idea: \(idea.id)")
         
         do {
             try savedIdeasManager.saveIdea(idea)
             await loadSavedIdeas()
         } catch {
-            Logger.app.error("Failed to save idea: \(error.localizedDescription)")
+            Logger.storage.error("Failed to save idea: \(error.localizedDescription)")
             self.error = error as? SavedIdeasError ?? .encodingError
             self.showError = true
             throw error
@@ -60,13 +60,13 @@ final class SavedIdeasViewModel: ObservableObject {
     /// Updates an existing idea in storage
     /// - Parameter idea: The idea with updated content
     func updateIdea(_ idea: Idea) async throws {
-        Logger.app.debug("Updating idea: \(idea.id)")
+        Logger.storage.debug("Updating idea: \(idea.id)")
         
         do {
             try savedIdeasManager.updateIdea(idea)
             await loadSavedIdeas()
         } catch {
-            Logger.app.error("Failed to update idea: \(error.localizedDescription)")
+            Logger.storage.error("Failed to update idea: \(error.localizedDescription)")
             self.error = error as? SavedIdeasError ?? .encodingError
             self.showError = true
             throw error
@@ -76,13 +76,13 @@ final class SavedIdeasViewModel: ObservableObject {
     /// Deletes an idea from storage
     /// - Parameter idea: The idea to delete
     func deleteIdea(_ idea: Idea) async throws {
-        Logger.app.debug("Deleting idea: \(idea.id)")
+        Logger.storage.debug("Deleting idea: \(idea.id)")
         
         do {
             try savedIdeasManager.deleteIdea(withId: idea.id)
             await loadSavedIdeas()
         } catch {
-            Logger.app.error("Failed to delete idea: \(error.localizedDescription)")
+            Logger.storage.error("Failed to delete idea: \(error.localizedDescription)")
             self.error = error as? SavedIdeasError ?? .encodingError
             self.showError = true
             throw error
