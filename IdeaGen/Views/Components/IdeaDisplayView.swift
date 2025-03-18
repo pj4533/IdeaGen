@@ -11,10 +11,11 @@ import OSLog
 struct IdeaDisplayView: View {
     let idea: Idea
     var onClear: () -> Void
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Generated Idea")
+            Text("\(UserSettings.shared.ideaPrompt)...")
                 .font(.headline)
                 .foregroundColor(.secondary)
             
@@ -23,22 +24,13 @@ struct IdeaDisplayView: View {
                     // Parse the idea content to extract the title and description
                     let components = IdeaContentParser.parse(idea.content)
                     
-                    if let title = components.title {
-                        Text(title)
-                            .font(.title)
-                            .fontWeight(.bold)
-                    }
-                    
-                    Text(components.description)
-                        .font(.body)
-                        .lineSpacing(4)
+                    Text(idea.content)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .lineSpacing(6)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.secondary.opacity(0.1))
-                )
             }
             
             HStack {
