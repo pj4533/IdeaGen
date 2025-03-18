@@ -29,4 +29,7 @@ extension Logger {
     
     // Prompt construction and AI generation
     static let prompt = Logger(subsystem: subsystem, category: "prompt")
+    
+    // Saved ideas storage and management
+    static let storage = Logger(subsystem: subsystem, category: "storage")
 }

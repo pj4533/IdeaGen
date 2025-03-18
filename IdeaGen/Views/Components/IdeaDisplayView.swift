@@ -11,6 +11,7 @@ import OSLog
 struct IdeaDisplayView: View {
     let idea: Idea
     var onClear: () -> Void
+    var onSave: () -> Void
     var isGenerating: Bool
     @Environment(\.colorScheme) private var colorScheme
     
@@ -39,6 +40,41 @@ struct IdeaDisplayView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
+                }
+                
+                // Action buttons for saving or clearing the idea
+                if !isGenerating {
+                    HStack(spacing: 20) {
+                        // Clear button
+                        Button(action: {
+                            Logger.ui.debug("Clear idea button tapped")
+                            onClear()
+                        }) {
+                            HStack {
+                                Image(systemName: "xmark")
+                                Text("Discard")
+                            }
+                            .frame(minWidth: 100)
+                        }
+                        .buttonStyle(.bordered)
+                        
+                        Spacer()
+                        
+                        // Save button
+                        Button(action: {
+                            Logger.ui.debug("Save idea button tapped")
+                            onSave()
+                        }) {
+                            HStack {
+                                Image(systemName: "square.and.arrow.down")
+                                Text("Save")
+                            }
+                            .frame(minWidth: 100)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.green)
+                    }
+                    .padding(.top, 8)
                 }
             }
             
@@ -73,6 +109,7 @@ struct IdeaDisplayView: View {
     IdeaDisplayView(
         idea: Idea(content: "TaskFlow\n\nA productivity app that uses AI to intelligently organize and prioritize your tasks based on deadlines, importance, and your work habits. It integrates with calendars and uses adaptive learning to suggest optimal times for focused work."),
         onClear: {},
+        onSave: {},
         isGenerating: false
     )
 }

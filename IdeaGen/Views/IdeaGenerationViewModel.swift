@@ -22,16 +22,19 @@ final class IdeaGenerationViewModel: ObservableObject, Sendable {
     
     private let openAIService: OpenAIServiceProtocol
     private let userSettings: UserSettings
+    private let savedIdeasManager: SavedIdeasManaging
     private var generatedIdeas: [Idea] = []
     
     // MARK: - Initialization
     
     init(
         openAIService: OpenAIServiceProtocol = OpenAIService.shared,
-        userSettings: UserSettings = .shared
+        userSettings: UserSettings = .shared,
+        savedIdeasManager: SavedIdeasManaging = SavedIdeasManager()
     ) {
         self.openAIService = openAIService
         self.userSettings = userSettings
+        self.savedIdeasManager = savedIdeasManager
     }
     
     // MARK: - Public Methods
@@ -92,6 +95,31 @@ final class IdeaGenerationViewModel: ObservableObject, Sendable {
     func clearIdea() {
         Logger.app.debug("Clearing current idea")
         currentIdea = nil
+    }
+    
+    /// Saves the current idea to storage and generates a new one
+    func saveCurrentIdea() {
+        guard let idea = currentIdea else {
+            Logger.app.error("No current idea to save")
+            return
+        }
+        
+        Logger.app.info("Saving current idea: \(idea.id)")
+        
+        Task {
+            do {
+                try savedIdeasManager.saveIdea(idea)
+                Logger.app.debug("Successfully saved idea: \(idea.id)")
+                
+                // Clear the current idea and generate a new one
+                currentIdea = nil
+                generateIdea()
+            } catch {
+                Logger.app.error("Failed to save idea: \(error.localizedDescription)")
+                self.error = .unknown
+                self.showError = true
+            }
+        }
     }
     
     // MARK: - Private Helper Methods

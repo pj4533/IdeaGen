@@ -28,6 +28,9 @@ struct IdeaGenerationView: View {
                             onClear: {
                                 viewModel.clearIdea()
                             },
+                            onSave: {
+                                viewModel.saveCurrentIdea()
+                            },
                             isGenerating: viewModel.isGenerating
                         )
                     } else {
@@ -48,6 +51,12 @@ struct IdeaGenerationView: View {
             .padding()
             .navigationTitle("IdeaGen")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    NavigationLink(destination: SavedIdeasListView()) {
+                        Image(systemName: "list.bullet")
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         Logger.ui.debug("Settings button tapped")
