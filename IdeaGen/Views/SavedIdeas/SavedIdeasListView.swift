@@ -79,15 +79,9 @@ struct SavedIdeasListView: View {
             if let selectedIdea = selectedIdea {
                 NavigationStack {
                     SavedIdeaEditView(idea: selectedIdea) { updatedIdea in
-                        Task {
-                            do {
-                                try await viewModel.updateIdea(updatedIdea)
-                                self.selectedIdea = nil
-                                showEditView = false
-                            } catch {
-                                Logger.app.error("Failed to update idea: \(error.localizedDescription)")
-                            }
-                        }
+                        try await viewModel.updateIdea(updatedIdea)
+                        self.selectedIdea = nil
+                        showEditView = false
                     } onCancel: {
                         self.selectedIdea = nil
                         showEditView = false

@@ -21,7 +21,11 @@ struct ApiKeySection: View {
             }
             
             if viewModel.userSettings.apiKeyStored && !viewModel.isEditingApiKey {
-                Button(action: { viewModel.deleteApiKey() }) {
+                Button(action: { 
+                    Task {
+                        await viewModel.deleteApiKey()
+                    }
+                }) {
                     Text("Delete API Key")
                         .foregroundStyle(.red)
                 }

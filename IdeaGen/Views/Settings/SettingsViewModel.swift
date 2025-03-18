@@ -23,37 +23,34 @@ final class SettingsViewModel: ObservableObject, Sendable {
         self.userSettings = userSettings
     }
     
-    func loadApiKey() {
+    func loadApiKey() async {
         Logger.ui.debug("Loading API key for display in settings")
-        // Since we're @MainActor, we need to use Task for the non-isolated KeychainManager
-        Task {
-            if let key = await KeychainManager.shared.getApiKey() {
-                apiKey = key
-                Logger.ui.info("API key loaded and masked for display")
-            } else {
-                Logger.ui.error("Failed to load API key for display")
-            }
+        if let key = await KeychainManager.shared.getApiKey() {
+            apiKey = key
+            Logger.ui.info("API key loaded and masked for display")
+        } else {
+            Logger.ui.error("Failed to load API key for display")
         }
     }
     
     func startEditing() {
         Logger.ui.debug("User initiated API key editing")
         isEditingApiKey = true
-        loadApiKey()
-    }
-    
-    func cancelEditing() {
-        Logger.ui.debug("User canceled API key editing")
-        isEditingApiKey = false
         Task {
-            if let key = await KeychainManager.shared.getApiKey() {
-                apiKey = key
-                Logger.ui.info("Restored original API key after canceling edit")
-            }
+            await loadApiKey()
         }
     }
     
-    func saveApiKey() {
+    func cancelEditing() async {
+        Logger.ui.debug("User canceled API key editing")
+        isEditingApiKey = false
+        if let key = await KeychainManager.shared.getApiKey() {
+            apiKey = key
+            Logger.ui.info("Restored original API key after canceling edit")
+        }
+    }
+    
+    func saveApiKey() async {
         Logger.ui.debug("Attempting to save API key")
         if apiKey.isEmpty {
             Logger.ui.error("Cannot save empty API key")
@@ -62,35 +59,31 @@ final class SettingsViewModel: ObservableObject, Sendable {
         
         let keyToSave = apiKey // Capture current value
         
-        Task {
-            if await KeychainManager.shared.saveApiKey(keyToSave) {
-                // userSettings is already on MainActor and we're in a MainActor class
-                userSettings.setApiKeyStored(true)
-                isEditingApiKey = false
-                alertMessage = isEditingApiKey ? "API Key updated successfully" : "API Key saved successfully"
-                showAlert = true
-                Logger.ui.info("API key saved successfully")
-            } else {
-                alertMessage = "Failed to save API Key"
-                showAlert = true
-                Logger.ui.error("Failed to save API key to keychain")
-            }
+        if await KeychainManager.shared.saveApiKey(keyToSave) {
+            // userSettings is already on MainActor and we're in a MainActor class
+            userSettings.setApiKeyStored(true)
+            isEditingApiKey = false
+            alertMessage = isEditingApiKey ? "API Key updated successfully" : "API Key saved successfully"
+            showAlert = true
+            Logger.ui.info("API key saved successfully")
+        } else {
+            alertMessage = "Failed to save API Key"
+            showAlert = true
+            Logger.ui.error("Failed to save API key to keychain")
         }
     }
     
-    func deleteApiKey() {
+    func deleteApiKey() async {
         Logger.ui.debug("User requested API key deletion")
         apiKey = ""
         
-        Task {
-            if await KeychainManager.shared.deleteApiKey() {
-                userSettings.setApiKeyStored(false)
-                alertMessage = "API Key deleted successfully"
-                showAlert = true
-                Logger.ui.info("API key successfully deleted")
-            } else {
-                Logger.ui.error("Failed to delete API key")
-            }
+        if await KeychainManager.shared.deleteApiKey() {
+            userSettings.setApiKeyStored(false)
+            alertMessage = "API Key deleted successfully"
+            showAlert = true
+            Logger.ui.info("API key successfully deleted")
+        } else {
+            Logger.ui.error("Failed to delete API key")
         }
     }
     

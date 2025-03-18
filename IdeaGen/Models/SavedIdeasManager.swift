@@ -10,10 +10,10 @@ import OSLog
 
 /// Protocol defining the interface for managing saved ideas
 protocol SavedIdeasManaging: Sendable {
-    func saveIdea(_ idea: Idea) throws
-    func getAllIdeas() -> [Idea]
-    func updateIdea(_ idea: Idea) throws
-    func deleteIdea(withId id: UUID) throws
+    func saveIdea(_ idea: Idea) async throws
+    func getAllIdeas() async -> [Idea]
+    func updateIdea(_ idea: Idea) async throws
+    func deleteIdea(withId id: UUID) async throws
 }
 
 /// Manages the storage and retrieval of saved ideas using UserDefaults
@@ -34,23 +34,24 @@ final class SavedIdeasManager: SavedIdeasManaging {
     
     /// Saves a new idea to storage
     /// - Parameter idea: The idea to save
-    func saveIdea(_ idea: Idea) throws {
+    func saveIdea(_ idea: Idea) async throws {
         Logger.storage.debug("Saving idea: \(idea.id)")
-        var savedIdeas = getAllIdeas()
+        let savedIdeas = await getAllIdeas()
         
         // Check if the idea already exists (just in case)
-        if let index = savedIdeas.firstIndex(where: { $0.id == idea.id }) {
-            savedIdeas[index] = idea
+        var updatedIdeas = savedIdeas
+        if let index = updatedIdeas.firstIndex(where: { $0.id == idea.id }) {
+            updatedIdeas[index] = idea
         } else {
-            savedIdeas.append(idea)
+            updatedIdeas.append(idea)
         }
         
-        try saveIdeasToStorage(savedIdeas)
+        try saveIdeasToStorage(updatedIdeas)
     }
     
     /// Retrieves all saved ideas from storage
     /// - Returns: Array of saved ideas, sorted by created date (newest first)
-    func getAllIdeas() -> [Idea] {
+    func getAllIdeas() async -> [Idea] {
         guard let data = UserDefaults.standard.data(forKey: savedIdeasKey) else {
             Logger.storage.debug("No saved ideas found")
             return []
@@ -69,30 +70,32 @@ final class SavedIdeasManager: SavedIdeasManaging {
     
     /// Updates an existing idea in storage
     /// - Parameter idea: The idea with updated content
-    func updateIdea(_ idea: Idea) throws {
+    func updateIdea(_ idea: Idea) async throws {
         Logger.storage.debug("Updating idea: \(idea.id)")
-        var savedIdeas = getAllIdeas()
+        let savedIdeas = await getAllIdeas()
         
-        guard let index = savedIdeas.firstIndex(where: { $0.id == idea.id }) else {
+        var updatedIdeas = savedIdeas
+        guard let index = updatedIdeas.firstIndex(where: { $0.id == idea.id }) else {
             throw SavedIdeasError.ideaNotFound
         }
         
-        savedIdeas[index] = idea
-        try saveIdeasToStorage(savedIdeas)
+        updatedIdeas[index] = idea
+        try saveIdeasToStorage(updatedIdeas)
     }
     
     /// Deletes an idea from storage
     /// - Parameter id: The ID of the idea to delete
-    func deleteIdea(withId id: UUID) throws {
+    func deleteIdea(withId id: UUID) async throws {
         Logger.storage.debug("Deleting idea: \(id)")
-        var savedIdeas = getAllIdeas()
+        let savedIdeas = await getAllIdeas()
         
-        guard let index = savedIdeas.firstIndex(where: { $0.id == id }) else {
+        var updatedIdeas = savedIdeas
+        guard let index = updatedIdeas.firstIndex(where: { $0.id == id }) else {
             throw SavedIdeasError.ideaNotFound
         }
         
-        savedIdeas.remove(at: index)
-        try saveIdeasToStorage(savedIdeas)
+        updatedIdeas.remove(at: index)
+        try saveIdeasToStorage(updatedIdeas)
     }
     
     // MARK: - Private Helpers

@@ -15,7 +15,9 @@ struct ApiKeyViewDisplay: View {
             Text(viewModel.maskApiKey(viewModel.apiKey))
                 .font(.system(.body, design: .monospaced))
                 .onAppear {
-                    viewModel.loadApiKey()
+                    Task {
+                        await viewModel.loadApiKey()
+                    }
                 }
             
             Spacer()

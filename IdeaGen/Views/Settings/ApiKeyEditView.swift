@@ -17,11 +17,17 @@ struct ApiKeyEditView: View {
                 .textInputAutocapitalization(.never)
                 .onAppear {
                     if viewModel.userSettings.apiKeyStored && viewModel.isEditingApiKey {
-                        viewModel.loadApiKey()
+                        Task {
+                            await viewModel.loadApiKey()
+                        }
                     }
                 }
             
-            Button(action: { viewModel.saveApiKey() }) {
+            Button(action: { 
+                Task {
+                    await viewModel.saveApiKey()
+                }
+            }) {
                 Text(viewModel.isEditingApiKey ? "Update API Key" : "Save API Key")
                     .frame(maxWidth: .infinity)
             }
@@ -30,7 +36,9 @@ struct ApiKeyEditView: View {
             
             if viewModel.isEditingApiKey {
                 Button("Cancel") {
-                    viewModel.cancelEditing()
+                    Task {
+                        await viewModel.cancelEditing()
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .buttonStyle(.bordered)

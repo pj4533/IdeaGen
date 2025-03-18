@@ -30,9 +30,7 @@ final class OpenAIService: OpenAIServiceProtocol {
     private let temperature: Float = 0.8
     private let maxTokens: Int = 1000
     
-    // Task isolation needed for Swift 6 concurrency
-    
-    init(keychainManager: KeychainManaging = KeychainManager.shared,
+    nonisolated init(keychainManager: KeychainManaging = KeychainManager.shared,
          urlSession: URLSession = .shared) {
         self.keychainManager = keychainManager
         self.urlSession = urlSession
@@ -45,7 +43,7 @@ final class OpenAIService: OpenAIServiceProtocol {
         Logger.prompt.info("User prompt: \(prompt)")
         
         // First, get the API key
-        guard let apiKey = keychainManager.getApiKey() else {
+        guard let apiKey = await keychainManager.getApiKey() else {
             Logger.network.error("No API key found for OpenAI service")
             return .failure(.noApiKey)
         }

@@ -27,7 +27,7 @@ final class IdeaGenerationViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    init(
+    nonisolated init(
         openAIService: OpenAIServiceProtocol = OpenAIService.shared,
         userSettings: UserSettings = .shared,
         savedIdeasManager: SavedIdeasManaging = SavedIdeasManager()
@@ -98,7 +98,7 @@ final class IdeaGenerationViewModel: ObservableObject {
     }
     
     /// Saves the current idea to storage and generates a new one
-    func saveCurrentIdea() {
+    func saveCurrentIdea() async {
         guard let idea = currentIdea else {
             Logger.app.error("No current idea to save")
             return
@@ -106,19 +106,17 @@ final class IdeaGenerationViewModel: ObservableObject {
         
         Logger.app.info("Saving current idea: \(idea.id)")
         
-        Task {
-            do {
-                try savedIdeasManager.saveIdea(idea)
-                Logger.app.debug("Successfully saved idea: \(idea.id)")
-                
-                // Clear the current idea and generate a new one
-                currentIdea = nil
-                generateIdea()
-            } catch {
-                Logger.app.error("Failed to save idea: \(error.localizedDescription)")
-                self.error = .unknown
-                self.showError = true
-            }
+        do {
+            try await savedIdeasManager.saveIdea(idea)
+            Logger.app.debug("Successfully saved idea: \(idea.id)")
+            
+            // Clear the current idea and generate a new one
+            currentIdea = nil
+            generateIdea()
+        } catch {
+            Logger.app.error("Failed to save idea: \(error.localizedDescription)")
+            self.error = .unknown
+            self.showError = true
         }
     }
     

@@ -11,9 +11,9 @@ import OSLog
 
 // Protocol for keychain operations
 protocol KeychainManaging: Sendable {
-    func saveApiKey(_ key: String) -> Bool
-    func getApiKey() -> String?
-    func deleteApiKey() -> Bool
+    func saveApiKey(_ key: String) async -> Bool
+    func getApiKey() async -> String?
+    func deleteApiKey() async -> Bool
 }
 
 // Make KeychainManager a final class with thread-safe operations
@@ -28,13 +28,13 @@ final class KeychainManager: KeychainManaging, @unchecked Sendable {
     let service: String
     let account: String
     
-    init(service: String = "com.saygoodnight.IdeaGen", account: String = "OpenAIApiKey") {
+    nonisolated init(service: String = "com.saygoodnight.IdeaGen", account: String = "OpenAIApiKey") {
         self.service = service
         self.account = account
     }
     
-    // Simple synchronous implementation that is thread-safe
-    func saveApiKey(_ key: String) -> Bool {
+    // Async implementation that is thread-safe
+    func saveApiKey(_ key: String) async -> Bool {
         Logger.keychain.debug("Attempting to save API key to keychain")
         guard let data = key.data(using: .utf8) else {
             Logger.keychain.error("Failed to convert API key to data")
@@ -84,8 +84,8 @@ final class KeychainManager: KeychainManaging, @unchecked Sendable {
         return false
     }
     
-    // Thread-safe synchronous implementation
-    func getApiKey() -> String? {
+    // Async implementation
+    func getApiKey() async -> String? {
         Logger.keychain.debug("Attempting to retrieve API key from keychain")
         
         let query: [String: Any] = [
@@ -122,8 +122,8 @@ final class KeychainManager: KeychainManaging, @unchecked Sendable {
         return key
     }
     
-    // Thread-safe synchronous implementation
-    func deleteApiKey() -> Bool {
+    // Async implementation
+    func deleteApiKey() async -> Bool {
         Logger.keychain.debug("Attempting to delete API key from keychain")
         
         let query: [String: Any] = [

@@ -24,7 +24,7 @@ final class SavedIdeasViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    init(savedIdeasManager: SavedIdeasManaging = SavedIdeasManager()) {
+    nonisolated init(savedIdeasManager: SavedIdeasManaging = SavedIdeasManager()) {
         self.savedIdeasManager = savedIdeasManager
     }
     
@@ -35,7 +35,7 @@ final class SavedIdeasViewModel: ObservableObject {
         Logger.storage.debug("Loading saved ideas")
         isLoading = true
         
-        savedIdeas = savedIdeasManager.getAllIdeas()
+        savedIdeas = await savedIdeasManager.getAllIdeas()
         
         isLoading = false
         Logger.storage.info("Loaded \(savedIdeas.count) saved ideas")
@@ -47,7 +47,7 @@ final class SavedIdeasViewModel: ObservableObject {
         Logger.storage.debug("Saving idea: \(idea.id)")
         
         do {
-            try savedIdeasManager.saveIdea(idea)
+            try await savedIdeasManager.saveIdea(idea)
             await loadSavedIdeas()
         } catch {
             Logger.storage.error("Failed to save idea: \(error.localizedDescription)")
@@ -63,7 +63,7 @@ final class SavedIdeasViewModel: ObservableObject {
         Logger.storage.debug("Updating idea: \(idea.id)")
         
         do {
-            try savedIdeasManager.updateIdea(idea)
+            try await savedIdeasManager.updateIdea(idea)
             await loadSavedIdeas()
         } catch {
             Logger.storage.error("Failed to update idea: \(error.localizedDescription)")
@@ -79,7 +79,7 @@ final class SavedIdeasViewModel: ObservableObject {
         Logger.storage.debug("Deleting idea: \(idea.id)")
         
         do {
-            try savedIdeasManager.deleteIdea(withId: idea.id)
+            try await savedIdeasManager.deleteIdea(withId: idea.id)
             await loadSavedIdeas()
         } catch {
             Logger.storage.error("Failed to delete idea: \(error.localizedDescription)")

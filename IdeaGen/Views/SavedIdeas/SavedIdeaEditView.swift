@@ -12,7 +12,7 @@ struct SavedIdeaEditView: View {
     // MARK: - Properties
     
     let idea: Idea
-    let onSave: (Idea) -> Void
+    let onSave: (Idea) async throws -> Void
     let onCancel: () -> Void
     
     @State private var editedContent: String
@@ -64,8 +64,14 @@ struct SavedIdeaEditView: View {
                 Button("Save") {
                     Logger.ui.debug("Saving edited idea")
                     let updatedIdea = Idea(id: idea.id, content: editedContent, createdAt: idea.createdAt)
-                    onSave(updatedIdea)
-                    dismiss()
+                    Task {
+                        do {
+                            try await onSave(updatedIdea)
+                            dismiss()
+                        } catch {
+                            Logger.ui.error("Failed to save edited idea: \(error.localizedDescription)")
+                        }
+                    }
                 }
                 .disabled(editedContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
@@ -80,7 +86,10 @@ struct SavedIdeaEditView: View {
                 content: "A productivity app that uses AI to intelligently organize and prioritize your tasks based on deadlines, importance, and your work habits.",
                 createdAt: Date()
             ),
-            onSave: { _ in },
+            onSave: { _ in
+                try? await Task.sleep(nanoseconds: 1)
+                return
+            },
             onCancel: { }
         )
     }
