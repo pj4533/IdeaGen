@@ -40,7 +40,7 @@ actor OpenAIService: OpenAIServiceProtocol {
     /// - Parameter prompt: The user prompt to generate the idea
     /// - Returns: An IdeaGenerationResult containing either the generated idea or an error
     func generateIdea(prompt: String) async -> IdeaGenerationResult {
-        Logger.network.debug("Generating idea with prompt: \(prompt)")
+        Logger.prompt.info("User prompt: \(prompt)")
         
         // First, get the API key
         guard let apiKey = await keychainManager.getApiKey() else {
@@ -50,6 +50,7 @@ actor OpenAIService: OpenAIServiceProtocol {
         
         // Construct the full prompt with additional context
         let fullPrompt = buildPrompt(prompt: prompt)
+        Logger.prompt.info("Full prompt to OpenAI: \(fullPrompt)")
         
         // Create the request body
         let requestBody = OpenAICompletionsRequest(
@@ -135,6 +136,7 @@ actor OpenAIService: OpenAIServiceProtocol {
             
             // Create and return the idea
             Logger.network.info("Successfully generated idea with OpenAI API")
+            Logger.prompt.info("Generated idea: \(content)")
             let idea = Idea(content: content)
             return .success(idea)
             

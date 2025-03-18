@@ -26,4 +26,7 @@ extension Logger {
     
     // UI related events and interactions
     static let ui = Logger(subsystem: subsystem, category: "ui")
+    
+    // Prompt construction and AI generation
+    static let prompt = Logger(subsystem: subsystem, category: "prompt")
 }
