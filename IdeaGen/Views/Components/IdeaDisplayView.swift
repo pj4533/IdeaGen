@@ -15,14 +15,14 @@ struct IdeaDisplayView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("\(UserSettings.shared.ideaPrompt)...")
-                .font(.headline)
-                .foregroundColor(.secondary)
-            
-            ScrollView {
-                ZStack(alignment: .center) {
-                    // Idea content text
+        ZStack {
+            // Main content
+            VStack(alignment: .leading, spacing: 16) {
+                Text("\(UserSettings.shared.ideaPrompt)...")
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+                
+                ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
                         // Parse the idea content to extract the title and description
                         let components = IdeaContentParser.parse(idea.content)
@@ -39,23 +39,31 @@ struct IdeaDisplayView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    
-                    // Loading animation - fixed position
-                    if isGenerating {
+                }
+            }
+            
+            // Loading animation - absolutely positioned over everything
+            if isGenerating {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
                         ZStack {
                             Image(systemName: "lightbulb.fill")
-                                .font(.system(size: 40))
+                                .font(.system(size: 80))
                                 .foregroundColor(.yellow)
                                 .symbolEffect(.pulse.byLayer, options: .repeating)
                             
                             Image(systemName: "sparkles")
-                                .font(.system(size: 50))
+                                .font(.system(size: 100))
                                 .foregroundColor(.orange.opacity(0.7))
                                 .symbolEffect(.bounce.up.byLayer, options: .repeating)
                         }
-                        .transition(.opacity)
+                        Spacer()
                     }
+                    Spacer()
                 }
+                .transition(.opacity)
             }
         }
     }
