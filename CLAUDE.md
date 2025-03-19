@@ -10,6 +10,12 @@
 - Build from command line: `xcodebuild -project IdeaGen.xcodeproj -scheme IdeaGen -configuration Debug -destination "platform=iOS Simulator,name=iPhone 16 Pro" build`
 - Run tests from command line: `xcodebuild -project IdeaGen.xcodeproj -scheme IdeaGen -configuration Debug -destination "platform=iOS Simulator,name=iPhone 16 Pro" test`
 
+## Documentation
+- Project documentation is located in the `/Docs` folder:
+  - `ideagen_spec.md`: Project specifications and requirements
+  - `swift6_concurrency__pitfalls_and_best_practices.md`: Guidance on Swift 6 concurrency
+  - `swifttesting_documentation.md`: How to use the SwiftTesting framework
+
 ## Testing Framework
 - Use **SwiftTesting** instead of XCTest for all tests
 - Import the Testing framework: `import Testing`
@@ -39,6 +45,16 @@
   - `Logger.network`: API communications
   - `Logger.ui`: User interface events
   - Use appropriate log levels (debug, info, error)
+
+## Swift 6 Concurrency Guidelines
+- **UI Code**: All SwiftUI views are `@MainActor` isolated in Swift 6 - keep UI work on main thread
+- **Background Tasks**: Use `Task.detached` not `Task` when in a `@MainActor` context to ensure heavy work runs off main thread
+- **Task Inheritance**: Be aware that `Task` inherits context from its creator - tasks created in `@MainActor` contexts inherit that isolation
+- **Thread Safety**: Make shared models `Sendable` or restrict usage to one actor for thread safety
+- **MainActor Usage**: Use `@MainActor` for types that work with UI, models that update UI state, or any code that must run on main thread
+- **Isolation Context**: For callbacks guaranteed to run on main thread, use `MainActor.assumeIsolated { ... }` instead of creating new tasks
+- **Sendable Conformance**: Ensure data passed between actors conforms to `Sendable` protocol to avoid data races
+- **Global Actors**: Swift 6 requires explicit actor isolation - types don't inherit global actor isolation from context
 
 ## Project Structure
 - **Models/**: Data models and shared state (UserSettings)
