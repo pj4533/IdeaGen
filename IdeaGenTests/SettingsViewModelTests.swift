@@ -48,11 +48,11 @@ struct SettingsViewModelTests {
         #expect(viewModel.isEditingApiKey == false, "Should not be in editing mode initially")
         
         // Start editing - this function uses tasks internally
-        viewModel.startEditing()
+        await viewModel.startEditing()
         #expect(viewModel.isEditingApiKey == true, "Should be in editing mode after startEditing")
         
         // Cancel editing - this function uses tasks internally
-        viewModel.cancelEditing()
+        await viewModel.cancelEditing()
         #expect(viewModel.isEditingApiKey == false, "Should exit editing mode after cancelEditing")
         
         // Since we can't replace the shared instance, we'll only test the state changes

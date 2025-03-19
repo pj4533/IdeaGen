@@ -27,14 +27,22 @@ final class IdeaGenerationViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    nonisolated init(
-        openAIService: OpenAIServiceProtocol = OpenAIService.shared,
-        userSettings: UserSettings = .shared,
-        savedIdeasManager: SavedIdeasManaging = SavedIdeasManager()
+    init(
+        openAIService: OpenAIServiceProtocol,
+        userSettings: UserSettings,
+        savedIdeasManager: SavedIdeasManaging
     ) {
         self.openAIService = openAIService
         self.userSettings = userSettings
         self.savedIdeasManager = savedIdeasManager
+    }
+    
+    convenience init() {
+        self.init(
+            openAIService: OpenAIService.shared,
+            userSettings: UserSettings.shared,
+            savedIdeasManager: SavedIdeasManager()
+        )
     }
     
     // MARK: - Public Methods
@@ -62,31 +70,45 @@ final class IdeaGenerationViewModel: ObservableObject {
         isGenerating = true
         error = nil
         
-        // Generate the idea asynchronously
-        Task {
-            // Create enhanced prompt with previous ideas
-            let enhancedPrompt = createEnhancedPrompt(basePrompt: prompt)
-            Logger.app.info("Generating idea with enhanced prompt that includes previous idea history")
+        // Create enhanced prompt before the detached task
+        let enhancedPrompt = createEnhancedPrompt(basePrompt: prompt)
+        Logger.app.info("Generating idea with enhanced prompt that includes previous idea history")
+        
+        // Generate the idea asynchronously in a detached task to avoid running on the main actor
+        Task.detached {
+            // Call the API
+            let result = await self.openAIService.generateIdea(prompt: enhancedPrompt)
             
-            let result = await openAIService.generateIdea(prompt: enhancedPrompt)
-            
+            // Process the result
             switch result {
             case .success(let idea):
                 Logger.app.info("Successfully generated idea: \(idea.content)")
-                currentIdea = idea
-                // Store the generated idea for future reference
-                self.generatedIdeas.append(idea)
-                Logger.app.debug("Added idea to history, total ideas: \(self.generatedIdeas.count)")
+                
+                // Return to the main actor for UI updates
+                await MainActor.run {
+                    self.currentIdea = idea
+                    // Store the generated idea for future reference
+                    self.generatedIdeas.append(idea)
+                    Logger.app.debug("Added idea to history, total ideas: \(self.generatedIdeas.count)")
+                }
                 
                 // Add a small delay for the animation to be noticeable
-                try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-                isGenerating = false
+                try? await Task.sleep(for: .milliseconds(200))
+                
+                // Final UI update
+                await MainActor.run {
+                    self.isGenerating = false
+                }
                 
             case .failure(let ideaError):
                 Logger.app.error("Failed to generate idea: \(ideaError.localizedDescription)")
-                error = ideaError
-                showError = true
-                isGenerating = false
+                
+                // Return to the main actor for UI updates
+                await MainActor.run {
+                    self.error = ideaError
+                    self.showError = true
+                    self.isGenerating = false
+                }
             }
         }
     }
@@ -98,7 +120,7 @@ final class IdeaGenerationViewModel: ObservableObject {
     }
     
     /// Saves the current idea to storage and generates a new one
-    func saveCurrentIdea() async {
+    func saveCurrentIdea() {
         guard let idea = currentIdea else {
             Logger.app.error("No current idea to save")
             return
@@ -106,17 +128,26 @@ final class IdeaGenerationViewModel: ObservableObject {
         
         Logger.app.info("Saving current idea: \(idea.id)")
         
-        do {
-            try await savedIdeasManager.saveIdea(idea)
-            Logger.app.debug("Successfully saved idea: \(idea.id)")
-            
-            // Clear the current idea and generate a new one
-            currentIdea = nil
-            generateIdea()
-        } catch {
-            Logger.app.error("Failed to save idea: \(error.localizedDescription)")
-            self.error = .unknown
-            self.showError = true
+        // Use detached task for background operation but return to MainActor for UI updates
+        Task.detached {
+            do {
+                try await self.savedIdeasManager.saveIdea(idea)
+                Logger.app.debug("Successfully saved idea: \(idea.id)")
+                
+                // Return to MainActor for UI updates
+                await MainActor.run {
+                    // Clear the current idea and generate a new one
+                    self.currentIdea = nil
+                    self.generateIdea()
+                }
+            } catch {
+                Logger.app.error("Failed to save idea: \(error.localizedDescription)")
+                
+                await MainActor.run {
+                    self.error = .unknown
+                    self.showError = true
+                }
+            }
         }
     }
     

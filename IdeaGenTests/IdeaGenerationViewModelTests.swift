@@ -26,13 +26,18 @@ struct IdeaGenerationViewModelTests {
         testDefaults.set(true, forKey: "apiKeyStored")
         
         let userSettings = UserSettings(defaults: testDefaults)
-        let viewModel = IdeaGenerationViewModel(openAIService: mockOpenAIService, userSettings: userSettings)
+        let mockSavedIdeasManager = MockSavedIdeasManager()
+        let viewModel = IdeaGenerationViewModel(
+            openAIService: mockOpenAIService, 
+            userSettings: userSettings,
+            savedIdeasManager: mockSavedIdeasManager
+        )
         
         // Act
         viewModel.generateIdea()
         
         // Allow time for the async task to complete
-        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+        try await Task.sleep(for: .seconds(1)) // 1 second
         
         // Assert
         #expect(viewModel.currentIdea?.content == testIdea.content, "ViewModel should have updated with the test idea")
@@ -59,13 +64,18 @@ struct IdeaGenerationViewModelTests {
         testDefaults.set(true, forKey: "apiKeyStored")
         
         let userSettings = UserSettings(defaults: testDefaults)
-        let viewModel = IdeaGenerationViewModel(openAIService: mockOpenAIService, userSettings: userSettings)
+        let mockSavedIdeasManager = MockSavedIdeasManager()
+        let viewModel = IdeaGenerationViewModel(
+            openAIService: mockOpenAIService, 
+            userSettings: userSettings,
+            savedIdeasManager: mockSavedIdeasManager
+        )
         
         // Act
         viewModel.generateIdea()
         
         // Allow time for the async task to complete
-        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+        try await Task.sleep(for: .seconds(1)) // 1 second
         
         // Assert
         #expect(viewModel.currentIdea == nil, "No idea should be set")
@@ -97,7 +107,12 @@ struct IdeaGenerationViewModelTests {
         testDefaults.set(false, forKey: "apiKeyStored") // No API key stored
         
         let userSettings = UserSettings(defaults: testDefaults)
-        let viewModel = IdeaGenerationViewModel(openAIService: mockOpenAIService, userSettings: userSettings)
+        let mockSavedIdeasManager = MockSavedIdeasManager()
+        let viewModel = IdeaGenerationViewModel(
+            openAIService: mockOpenAIService, 
+            userSettings: userSettings,
+            savedIdeasManager: mockSavedIdeasManager
+        )
         
         // Act
         viewModel.generateIdea()
@@ -105,7 +120,7 @@ struct IdeaGenerationViewModelTests {
         // Assert - this happens synchronously since we check for API key before making async call
         #expect(viewModel.currentIdea == nil, "No idea should be set")
         #expect(viewModel.isGenerating == false, "Generation should not start")
-        #expect(viewModel.error == .noApiKey, "Error should be noApiKey")
+        #expect(viewModel.error == IdeaGenerationError.noApiKey, "Error should be noApiKey")
         #expect(viewModel.showError == true, "Error alert should be shown")
         
         let callCount = await mockOpenAIService.callCount
@@ -124,7 +139,12 @@ struct IdeaGenerationViewModelTests {
         let suiteName = "test_defaults_\(UUID().uuidString)"
         let testDefaults = UserDefaults(suiteName: suiteName)!
         let userSettings = UserSettings(defaults: testDefaults)
-        let viewModel = IdeaGenerationViewModel(openAIService: mockOpenAIService, userSettings: userSettings)
+        let mockSavedIdeasManager = MockSavedIdeasManager()
+        let viewModel = IdeaGenerationViewModel(
+            openAIService: mockOpenAIService, 
+            userSettings: userSettings,
+            savedIdeasManager: mockSavedIdeasManager
+        )
         
         // Set an idea manually
         viewModel.currentIdea = testIdea

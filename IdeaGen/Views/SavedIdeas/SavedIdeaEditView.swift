@@ -20,7 +20,7 @@ struct SavedIdeaEditView: View {
     
     // MARK: - Initialization
     
-    init(idea: Idea, onSave: @escaping (Idea) -> Void, onCancel: @escaping () -> Void) {
+    init(idea: Idea, onSave: @escaping (Idea) async throws -> Void, onCancel: @escaping () -> Void) {
         self.idea = idea
         self.onSave = onSave
         self.onCancel = onCancel
@@ -87,8 +87,7 @@ struct SavedIdeaEditView: View {
                 createdAt: Date()
             ),
             onSave: { _ in
-                try? await Task.sleep(nanoseconds: 1)
-                return
+                try? await Task.sleep(for: .milliseconds(1))
             },
             onCancel: { }
         )

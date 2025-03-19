@@ -25,9 +25,7 @@ struct IdeaDisplayView: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
-                        // Parse the idea content to extract the title and description
-                        let components = IdeaContentParser.parse(idea.content)
-                        
+                        // Idea content text
                         Text(idea.content)
                             .font(.system(size: 28, weight: .bold, design: .default))
                             .minimumScaleFactor(0.5)

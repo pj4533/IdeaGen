@@ -24,8 +24,12 @@ final class SavedIdeasViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    nonisolated init(savedIdeasManager: SavedIdeasManaging = SavedIdeasManager()) {
+    init(savedIdeasManager: SavedIdeasManaging) {
         self.savedIdeasManager = savedIdeasManager
+    }
+    
+    convenience init() {
+        self.init(savedIdeasManager: SavedIdeasManager())
     }
     
     // MARK: - Public Methods
@@ -33,12 +37,12 @@ final class SavedIdeasViewModel: ObservableObject {
     /// Loads all saved ideas from storage
     func loadSavedIdeas() async {
         Logger.storage.debug("Loading saved ideas")
-        isLoading = true
+        self.isLoading = true
         
-        savedIdeas = await savedIdeasManager.getAllIdeas()
+        self.savedIdeas = await savedIdeasManager.getAllIdeas()
         
-        isLoading = false
-        Logger.storage.info("Loaded \(savedIdeas.count) saved ideas")
+        self.isLoading = false
+        Logger.storage.info("Loaded \(self.savedIdeas.count) saved ideas")
     }
     
     /// Saves a new idea to storage
