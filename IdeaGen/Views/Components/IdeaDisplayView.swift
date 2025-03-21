@@ -19,7 +19,7 @@ struct IdeaDisplayView: View {
             // Main content
             VStack(alignment: .leading, spacing: 16) {
                 Text("\(UserSettings.shared.ideaPrompt)...")
-                    .font(.headline)
+                    .font(.system(size: 26, weight: .semibold))
                     .foregroundColor(.secondary)
                 
                 IdeaContentView(idea: idea, isGenerating: isGenerating)

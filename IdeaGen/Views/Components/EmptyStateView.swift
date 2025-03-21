@@ -16,8 +16,8 @@ struct EmptyStateView: View {
         ZStack {
             // Main content
             VStack(alignment: .leading, spacing: 16) {
-                Text("\(userSettings.ideaPrompt)...")
-                    .font(.headline)
+                Text("\(UserSettings.shared.ideaPrompt)...")
+                    .font(.system(size: 26, weight: .semibold))
                     .foregroundColor(.secondary)
                 
                 ScrollView {
