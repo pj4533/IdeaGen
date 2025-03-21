@@ -61,12 +61,12 @@ struct IdeaDisplayView: View {
                         
                         // Save and generate button
                         Button(action: {
-                            Logger.ui.debug("Save and next button tapped")
+                            Logger.ui.debug("Save and new button tapped")
                             onSave()
                         }) {
                             HStack {
                                 Image(systemName: "square.and.arrow.down")
-                                Text("Save & Next")
+                                Text("Save & New")
                                     .fontWeight(.semibold)
                             }
                             .frame(height: 50)
