@@ -46,11 +46,11 @@ struct IdeaDisplayView: View {
                         // Generate New button
                         Button(action: {
                             Logger.ui.debug("Generate new idea button tapped")
-                            onClear()
+                            onClear() // Now calls generateIdea() directly
                         }) {
                             HStack {
                                 Image(systemName: "bolt.fill")
-                                Text("New Idea")
+                                Text("Generate New")
                                     .fontWeight(.semibold)
                             }
                             .frame(height: 50)
