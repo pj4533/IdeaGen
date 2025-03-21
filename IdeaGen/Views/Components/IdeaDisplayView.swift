@@ -13,7 +13,6 @@ struct IdeaDisplayView: View {
     var onClear: () -> Void
     var onSave: () -> Void
     var isGenerating: Bool
-    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         ZStack {
@@ -23,84 +22,17 @@ struct IdeaDisplayView: View {
                     .font(.headline)
                     .foregroundColor(.secondary)
                 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 12) {
-                        // Idea content text
-                        Text(idea.content)
-                            .font(.system(size: 28, weight: .bold, design: .default))
-                            .minimumScaleFactor(0.5)
-                            .lineLimit(nil)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .lineSpacing(6)
-                            .blur(radius: isGenerating ? 30 : 0)
-                            .opacity(isGenerating ? 0.2 : 1)
-                            .animation(.easeInOut(duration: 0.2), value: isGenerating)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                }
+                IdeaContentView(idea: idea, isGenerating: isGenerating)
                 
                 // Action buttons for saving or generating a new idea - only visible when not generating
                 if !isGenerating {
-                    HStack(spacing: 10) {
-                        // Generate New button
-                        Button(action: {
-                            Logger.ui.debug("Generate new idea button tapped")
-                            onClear() // Now calls generateIdea() directly
-                        }) {
-                            HStack {
-                                Image(systemName: "bolt.fill")
-                                Text("Generate New")
-                                    .fontWeight(.semibold)
-                            }
-                            .frame(height: 50)
-                            .frame(maxWidth: .infinity)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.bordered)
-                        
-                        // Save and generate button
-                        Button(action: {
-                            Logger.ui.debug("Save and new button tapped")
-                            onSave()
-                        }) {
-                            HStack {
-                                Image(systemName: "square.and.arrow.down")
-                                Text("Save & New")
-                                    .fontWeight(.semibold)
-                            }
-                            .frame(height: 50)
-                            .frame(maxWidth: .infinity)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.green)
-                    }
+                    IdeaActionButtonsView(onClear: onClear, onSave: onSave)
                 }
             }
             
             // Loading animation - only visible component during generation
             if isGenerating {
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        ZStack {
-                            Image(systemName: "lightbulb.fill")
-                                .font(.system(size: 100))
-                                .foregroundColor(.yellow)
-                                .symbolEffect(.pulse.byLayer, options: .repeating)
-                            
-                            Image(systemName: "sparkles")
-                                .font(.system(size: 120))
-                                .foregroundColor(.orange.opacity(0.7))
-                                .symbolEffect(.bounce.up.byLayer, options: .repeating)
-                        }
-                        Spacer()
-                    }
-                    Spacer()
-                }
-                .transition(.opacity)
+                IdeaLoadingView()
             }
         }
     }
