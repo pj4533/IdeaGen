@@ -35,14 +35,16 @@ struct IdeaGenerationView: View {
                     }
                 }
                 
-                // Generate button
-                GenerateButtonView(
-                    isGenerating: viewModel.isGenerating,
-                    isDisabled: !userSettings.apiKeyStored,
-                    onGenerate: {
-                        viewModel.generateIdea()
-                    }
-                )
+                // Only show generate button when no idea is present
+                if viewModel.currentIdea == nil {
+                    GenerateButtonView(
+                        isGenerating: viewModel.isGenerating,
+                        isDisabled: !userSettings.apiKeyStored,
+                        onGenerate: {
+                            viewModel.generateIdea()
+                        }
+                    )
+                }
             }
             .padding()
             .navigationTitle("IdeaGen")

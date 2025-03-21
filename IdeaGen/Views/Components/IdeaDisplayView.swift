@@ -40,23 +40,24 @@ struct IdeaDisplayView: View {
                     .padding()
                 }
                 
-                // Action buttons for saving or clearing the idea
+                // Action buttons for saving or generating a new idea
                 if !isGenerating {
-                    HStack(spacing: 20) {
-                        // Clear button
+                    HStack(spacing: 10) {
+                        // Generate New button
                         Button(action: {
-                            Logger.ui.debug("Clear idea button tapped")
+                            Logger.ui.debug("Generate new idea button tapped")
                             onClear()
                         }) {
                             HStack {
-                                Image(systemName: "xmark")
-                                Text("Discard")
+                                Image(systemName: "bolt.fill")
+                                Text("New Idea")
+                                    .fontWeight(.semibold)
                             }
-                            .frame(minWidth: 100)
+                            .frame(height: 50)
+                            .frame(maxWidth: .infinity)
+                            .contentShape(Rectangle())
                         }
                         .buttonStyle(.bordered)
-                        
-                        Spacer()
                         
                         // Save button
                         Button(action: {
@@ -66,13 +67,15 @@ struct IdeaDisplayView: View {
                             HStack {
                                 Image(systemName: "square.and.arrow.down")
                                 Text("Save")
+                                    .fontWeight(.semibold)
                             }
-                            .frame(minWidth: 100)
+                            .frame(height: 50)
+                            .frame(maxWidth: .infinity)
+                            .contentShape(Rectangle())
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(.green)
                     }
-                    .padding(.top, 8)
                 }
             }
             
