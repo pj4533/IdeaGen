@@ -26,9 +26,11 @@ struct IdeaContentView: View {
                         .opacity(isGenerating ? 0.2 : 1)
                         .animation(.easeInOut(duration: 0.2), value: isGenerating)
                 }
-                .frame(maxWidth: .infinity, minHeight: geometry.size.height, alignment: .leading)
-                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding([.horizontal, .bottom])
+                .padding(.top, 0)
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
     }
     
