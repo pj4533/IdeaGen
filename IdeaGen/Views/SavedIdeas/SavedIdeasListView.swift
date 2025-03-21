@@ -13,82 +13,56 @@ struct SavedIdeasListView: View {
     @State private var selectedIdea: Idea?
     @State private var showEditView = false
     
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter
-    }()
-    
     var body: some View {
-        List {
-            ForEach(viewModel.savedIdeas) { idea in
-                Button(action: {
-                    Logger.ui.debug("Selected saved idea: \(idea.id)")
-                    selectedIdea = idea
-                    showEditView = true
-                }) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(idea.content)
-                            .font(.headline)
-                            .lineLimit(2)
-                            .foregroundColor(.primary)
-                        
-                        Text("Saved on \(dateFormatter.string(from: idea.createdAt))")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                }
-                .swipeActions {
-                    Button(role: .destructive) {
-                        Task {
-                            do {
-                                try await viewModel.deleteIdea(idea)
-                            } catch {
-                                Logger.app.error("Failed to delete idea: \(error.localizedDescription)")
-                            }
-                        }
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
+        ideaListContent
+            .navigationTitle("Saved Ideas")
+            .task {
+                await viewModel.loadSavedIdeas()
+            }
+            .refreshable {
+                await viewModel.loadSavedIdeas()
+            }
+            .overlay {
+                if viewModel.savedIdeas.isEmpty {
+                    SavedIdeasEmptyStateView()
                 }
             }
-        }
-        .navigationTitle("Saved Ideas")
-        .task {
-            await viewModel.loadSavedIdeas()
-        }
-        .refreshable {
-            await viewModel.loadSavedIdeas()
-        }
-        .overlay {
-            if viewModel.savedIdeas.isEmpty {
-                ContentUnavailableView(
-                    "No Saved Ideas",
-                    systemImage: "lightbulb",
-                    description: Text("Your saved ideas will appear here")
+            .sheet(isPresented: $showEditView, onDismiss: {
+                Task {
+                    await viewModel.loadSavedIdeas()
+                }
+            }) {
+                SavedIdeaDetailSheet(
+                    idea: selectedIdea,
+                    onSave: { updatedIdea in
+                        try await viewModel.updateIdea(updatedIdea)
+                        clearSelection()
+                    },
+                    onDismiss: clearSelection
+                )
+            }
+    }
+    
+    private var ideaListContent: some View {
+        List {
+            ForEach(viewModel.savedIdeas) { idea in
+                SavedIdeaRowView(
+                    idea: idea,
+                    onSelect: { selectedIdea in
+                        self.selectedIdea = selectedIdea
+                        showEditView = true
+                    },
+                    onDelete: { idea in
+                        try await viewModel.deleteIdea(idea)
+                    }
                 )
             }
         }
-        .sheet(isPresented: $showEditView, onDismiss: {
-            Task {
-                await viewModel.loadSavedIdeas()
-            }
-        }) {
-            if let selectedIdea = selectedIdea {
-                NavigationStack {
-                    SavedIdeaEditView(idea: selectedIdea) { updatedIdea in
-                        try await viewModel.updateIdea(updatedIdea)
-                        self.selectedIdea = nil
-                        showEditView = false
-                    } onCancel: {
-                        self.selectedIdea = nil
-                        showEditView = false
-                    }
-                }
-            }
-        }
+    }
+    
+    private func clearSelection() {
+        selectedIdea = nil
+        showEditView = false
     }
 }
 
