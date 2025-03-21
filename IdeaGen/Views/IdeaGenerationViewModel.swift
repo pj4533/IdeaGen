@@ -159,18 +159,12 @@ final class IdeaGenerationViewModel: ObservableObject {
     private func createEnhancedPrompt(basePrompt: String) -> String {
         var enhancedPrompt = "Here is the basis for the idea you should generate: \(basePrompt)"
         
-        // Get all saved ideas asynchronously but synchronously in this context
-        let savedIdeas = Task.detached {
-            return await self.savedIdeasManager.getAllIdeas()
-        }.result
-        
-        // Combine both generated and saved ideas
+        // Only use ideas generated during this session for now
+        // We'll retrieve saved ideas in a future update with proper async handling
         var allIdeas = self.generatedIdeas
         
-        // Add saved ideas if we successfully got them
-        if case .success(let savedIdeasList) = savedIdeas {
-            allIdeas.append(contentsOf: savedIdeasList)
-            Logger.app.debug("Added \(savedIdeasList.count) saved ideas to prompt context")
+        if !allIdeas.isEmpty {
+            Logger.app.debug("Using \(allIdeas.count) session ideas in prompt context")
         }
         
         // Only add ideas if we have some
