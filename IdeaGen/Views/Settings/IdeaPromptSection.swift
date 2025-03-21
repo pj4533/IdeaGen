@@ -13,6 +13,7 @@ struct IdeaPromptSection: View {
     var body: some View {
         Section(header: Text("Idea Prompt"), footer: Text("This prompt will be used to generate ideas")) {
             TextEditor(text: $settings.ideaPrompt)
+                .font(.system(size: 16))
                 .frame(minHeight: 100)
         }
     }
