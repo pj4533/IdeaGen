@@ -153,25 +153,39 @@ final class IdeaGenerationViewModel: ObservableObject {
     
     // MARK: - Private Helper Methods
     
-    /// Creates an enhanced prompt that includes previously generated ideas
+    /// Creates an enhanced prompt that includes previously generated ideas and saved ideas
     /// - Parameter basePrompt: The original user prompt
     /// - Returns: Enhanced prompt with instructions to generate different ideas
     private func createEnhancedPrompt(basePrompt: String) -> String {
         var enhancedPrompt = "Here is the basis for the idea you should generate: \(basePrompt)"
         
-        // Only add previous ideas if we have some
-        if !self.generatedIdeas.isEmpty {
+        // Get all saved ideas asynchronously but synchronously in this context
+        let savedIdeas = Task.detached {
+            return await self.savedIdeasManager.getAllIdeas()
+        }.result
+        
+        // Combine both generated and saved ideas
+        var allIdeas = self.generatedIdeas
+        
+        // Add saved ideas if we successfully got them
+        if case .success(let savedIdeasList) = savedIdeas {
+            allIdeas.append(contentsOf: savedIdeasList)
+            Logger.app.debug("Added \(savedIdeasList.count) saved ideas to prompt context")
+        }
+        
+        // Only add ideas if we have some
+        if !allIdeas.isEmpty {
             // Start with the instruction
             enhancedPrompt += "\n\nMake sure the idea is significantly different than each of these: "
             
             // Add each previous idea
-            let previousIdeasText = self.generatedIdeas
+            let ideasText = allIdeas
                 .map { $0.content }
                 .joined(separator: ", ")
             
-            enhancedPrompt += previousIdeasText
+            enhancedPrompt += ideasText
             
-            Logger.app.debug("Enhanced prompt with \(self.generatedIdeas.count) previous ideas")
+            Logger.app.debug("Enhanced prompt with \(allIdeas.count) total ideas")
         }
         
         return enhancedPrompt
