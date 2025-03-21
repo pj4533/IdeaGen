@@ -54,12 +54,12 @@ struct EmptyStateView: View {
                         Spacer()
                         ZStack {
                             Image(systemName: "lightbulb.fill")
-                                .font(.system(size: 80))
+                                .font(.system(size: 100))
                                 .foregroundColor(.yellow)
                                 .symbolEffect(.pulse.byLayer, options: .repeating)
                             
                             Image(systemName: "sparkles")
-                                .font(.system(size: 100))
+                                .font(.system(size: 120))
                                 .foregroundColor(.orange.opacity(0.7))
                                 .symbolEffect(.bounce.up.byLayer, options: .repeating)
                         }

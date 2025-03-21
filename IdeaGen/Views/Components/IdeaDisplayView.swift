@@ -40,46 +40,46 @@ struct IdeaDisplayView: View {
                     .padding()
                 }
                 
-                // Action buttons for saving or generating a new idea - always visible
-                HStack(spacing: 10) {
-                    // Generate New button
-                    Button(action: {
-                        Logger.ui.debug("Generate new idea button tapped")
-                        onClear() // Now calls generateIdea() directly
-                    }) {
-                        HStack {
-                            Image(systemName: "bolt.fill")
-                            Text("Generate New")
-                                .fontWeight(.semibold)
+                // Action buttons for saving or generating a new idea - only visible when not generating
+                if !isGenerating {
+                    HStack(spacing: 10) {
+                        // Generate New button
+                        Button(action: {
+                            Logger.ui.debug("Generate new idea button tapped")
+                            onClear() // Now calls generateIdea() directly
+                        }) {
+                            HStack {
+                                Image(systemName: "bolt.fill")
+                                Text("Generate New")
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(height: 50)
+                            .frame(maxWidth: .infinity)
+                            .contentShape(Rectangle())
                         }
-                        .frame(height: 50)
-                        .frame(maxWidth: .infinity)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(isGenerating)
-                    
-                    // Save and generate button
-                    Button(action: {
-                        Logger.ui.debug("Save and new button tapped")
-                        onSave()
-                    }) {
-                        HStack {
-                            Image(systemName: "square.and.arrow.down")
-                            Text("Save & New")
-                                .fontWeight(.semibold)
+                        .buttonStyle(.bordered)
+                        
+                        // Save and generate button
+                        Button(action: {
+                            Logger.ui.debug("Save and new button tapped")
+                            onSave()
+                        }) {
+                            HStack {
+                                Image(systemName: "square.and.arrow.down")
+                                Text("Save & New")
+                                    .fontWeight(.semibold)
+                            }
+                            .frame(height: 50)
+                            .frame(maxWidth: .infinity)
+                            .contentShape(Rectangle())
                         }
-                        .frame(height: 50)
-                        .frame(maxWidth: .infinity)
-                        .contentShape(Rectangle())
+                        .buttonStyle(.borderedProminent)
+                        .tint(.green)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
-                    .disabled(isGenerating)
                 }
             }
             
-            // Loading animation - absolutely positioned over everything
+            // Loading animation - only visible component during generation
             if isGenerating {
                 VStack {
                     Spacer()
@@ -87,12 +87,12 @@ struct IdeaDisplayView: View {
                         Spacer()
                         ZStack {
                             Image(systemName: "lightbulb.fill")
-                                .font(.system(size: 80))
+                                .font(.system(size: 100))
                                 .foregroundColor(.yellow)
                                 .symbolEffect(.pulse.byLayer, options: .repeating)
                             
                             Image(systemName: "sparkles")
-                                .font(.system(size: 100))
+                                .font(.system(size: 120))
                                 .foregroundColor(.orange.opacity(0.7))
                                 .symbolEffect(.bounce.up.byLayer, options: .repeating)
                         }

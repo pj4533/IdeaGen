@@ -14,48 +14,51 @@ struct GenerateButtonView: View {
     var onGenerate: () -> Void
     
     var body: some View {
-        Button(action: {
-            Logger.ui.debug("Generate idea button tapped")
-            onGenerate()
-        }) {
-            HStack {
-                if isGenerating {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .tint(.white)
-                } else {
+        if !isGenerating {
+            Button(action: {
+                Logger.ui.debug("Generate idea button tapped")
+                onGenerate()
+            }) {
+                HStack {
                     Image(systemName: "bolt.fill")
+                    Text("Generate Idea")
                 }
-                
-                Text(isGenerating ? "Generating..." : "Generate Idea")
+                .frame(minWidth: 200)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.accentColor)
+                )
+                .foregroundColor(.white)
             }
-            .frame(minWidth: 200)
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.accentColor)
-            )
-            .foregroundColor(.white)
+            .disabled(isDisabled)
+            .padding(.bottom, 20)
+        } else {
+            // Empty view with same padding when generating
+            Color.clear
+                .frame(height: 20)
+                .padding(.bottom, 20)
         }
-        .disabled(isGenerating || isDisabled)
-        .padding(.bottom, 20)
     }
 }
 
 #Preview {
     VStack {
+        // Normal state
         GenerateButtonView(
             isGenerating: false,
             isDisabled: false,
             onGenerate: {}
         )
         
+        // Generating state (should be invisible)
         GenerateButtonView(
             isGenerating: true,
             isDisabled: false,
             onGenerate: {}
         )
         
+        // Disabled state
         GenerateButtonView(
             isGenerating: false,
             isDisabled: true,
