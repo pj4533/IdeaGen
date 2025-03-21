@@ -40,42 +40,42 @@ struct IdeaDisplayView: View {
                     .padding()
                 }
                 
-                // Action buttons for saving or generating a new idea
-                if !isGenerating {
-                    HStack(spacing: 10) {
-                        // Generate New button
-                        Button(action: {
-                            Logger.ui.debug("Generate new idea button tapped")
-                            onClear() // Now calls generateIdea() directly
-                        }) {
-                            HStack {
-                                Image(systemName: "bolt.fill")
-                                Text("Generate New")
-                                    .fontWeight(.semibold)
-                            }
-                            .frame(height: 50)
-                            .frame(maxWidth: .infinity)
-                            .contentShape(Rectangle())
+                // Action buttons for saving or generating a new idea - always visible
+                HStack(spacing: 10) {
+                    // Generate New button
+                    Button(action: {
+                        Logger.ui.debug("Generate new idea button tapped")
+                        onClear() // Now calls generateIdea() directly
+                    }) {
+                        HStack {
+                            Image(systemName: "bolt.fill")
+                            Text("Generate New")
+                                .fontWeight(.semibold)
                         }
-                        .buttonStyle(.bordered)
-                        
-                        // Save and generate button
-                        Button(action: {
-                            Logger.ui.debug("Save and new button tapped")
-                            onSave()
-                        }) {
-                            HStack {
-                                Image(systemName: "square.and.arrow.down")
-                                Text("Save & New")
-                                    .fontWeight(.semibold)
-                            }
-                            .frame(height: 50)
-                            .frame(maxWidth: .infinity)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.green)
+                        .frame(height: 50)
+                        .frame(maxWidth: .infinity)
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.bordered)
+                    .disabled(isGenerating)
+                    
+                    // Save and generate button
+                    Button(action: {
+                        Logger.ui.debug("Save and new button tapped")
+                        onSave()
+                    }) {
+                        HStack {
+                            Image(systemName: "square.and.arrow.down")
+                            Text("Save & New")
+                                .fontWeight(.semibold)
+                        }
+                        .frame(height: 50)
+                        .frame(maxWidth: .infinity)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.green)
+                    .disabled(isGenerating)
                 }
             }
             
